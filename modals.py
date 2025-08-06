@@ -54,7 +54,10 @@ class VerificationSecondModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction):
         auth_code = inter.text_values['auth_code']
         print(auth_code)
-        correct_code = await CheckAuthCode(auth_code)
+        try:
+            correct_code = await CheckAuthCode(auth_code)
+        except:
+            await inter.response.send_message("A megadott hitelesítési kód hibás, vagy hiányos!", ephemeral=True)
         if correct_code:
             await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
             bme_role = inter.guild.get_role(BME_MEMBER_ROLE_ID)
