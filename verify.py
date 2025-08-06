@@ -1,9 +1,40 @@
-def CreateAuthCode(email: str):
-    authCode = 0
-    # Create email entry with authCode value!
-    return
+from prisma import Client
+import random
+async def CreateAuthCode(email: str):
+    client = Client()
+    await client.connect()
+    authCode = random.randint(1000000000, 9999999999)
+    await client.auth.create(
+        data = {
+            'email': email,
+            'authcode': authCode
+        }
+    )
+    await client.disconnect()
+    return authCode
 
-def CheckAuthCode(email: str, authCode: str):
-    if True: # STUB, check DB for correct authCode at email entry!
+async def CheckAuthCode(authCode: str):
+    client = Client()
+    await client.connect()
+    authCode = int(authCode)
+    result = await client.auth.find_first(
+        where={
+            'authcode': authCode
+        }
+    )
+    if result == None:
+        return False
+    else:
+        await RemoveAuthCode(authCode)
         return True
-    return False
+
+async def RemoveAuthCode(authCode: str):
+    client = Client()
+    authCode = int(authCode)
+    await client.connect()
+    await client.auth.delete(
+        where={
+            'authcode': authCode
+        }
+    )
+    await client.disconnect()
