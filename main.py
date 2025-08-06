@@ -43,7 +43,7 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member: disnake.Member):
-    invites_before = guild_invites[0]
+    invites_before = guild_invites
     invites_after = await member.guild.invites()
     used_invite = None
     for before_invite in invites_before:
@@ -58,7 +58,7 @@ async def on_member_join(member: disnake.Member):
     if used_invite:
         inviter = used_invite.inviter
         def BuildGuestApprovalEmbed():
-            embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{member.name}**({member.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha ismert BME tagok hívott meg!")
+            embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{member.name}**({member.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha BME tagot hívott meg!")
             return embed
         embed = BuildGuestApprovalEmbed()
         await inviter.send(embed=embed, components=[
