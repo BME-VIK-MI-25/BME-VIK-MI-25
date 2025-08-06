@@ -22,7 +22,7 @@ async def IsVerificationMessagePresent():
     return True
 
 def BuildVerificationEmbed():
-    embed = disnake.Embed(title="Hitelesítés", description="Hogy hozzáférést szerezz a szerver többi részéhez, kérlek hitelesítsd fiókod!\n\nHogy ezt megtedd, az üzenet alatt lévő gombra nyomj rá, majd a [NEVED]@edu.bme.hu emailcímedet add meg. Ezt [itt](https://login.bme.hu/admin/) találhatod!\nEzt követően erre az email címre(Outlook) kapsz egy kódot, amelyet meg kell adnod.", color=disnake.Color.dark_red())
+    embed = disnake.Embed(title="Hitelesítés", description="Hogy hozzáférést szerezz a szerver többi részéhez, kérlek hitelesítsd fiókod!\n\nHogy ezt megtedd, az üzenet alatt lévő gombra nyomj rá, majd a [NEVED]@edu.bme.hu emailcímedet add meg. Ezt [itt](https://login.bme.hu/admin/username) találhatod!\nEzt követően erre az email címre(Outlook) kapsz egy kódot, amelyet meg kell adnod.", color=disnake.Color.dark_red())
     return embed
 
 def VerificationView():

@@ -16,10 +16,18 @@ async def SendAuthCode(to_email: str):
     with smtplib.SMTP_SSL("mail.nethely.hu", port, context=context) as email_server:
         email_server.login(EMAIL, SMTP_PW)
         message = EmailMessage()
-        message.set_content(f'A Discord szerveren történő hitelesítéshez szükséges kód: {auth_code}')
-        message['Subject'] = "Discord szerver hitelesítés"
+        html = f"""<html>
+                            <head></head>
+                            <body>
+                            <center>
+                                <img src="https://play-lh.googleusercontent.com/074LK6vDEKUreS4u50Yf3DiDyE0Mgs4yVAe6zmkl2vdWCRVIbAboAEcToZZHHi-Um4SD" width="392px" height="392px"/>
+                            <h2>A szerveren való hitelesítéshez szükséges kód:<br><span style="background-color: rgb(20, 20, 20); padding: 5px;"><b>{auth_code}</b></span></h2>
+                            </center>
+                            </body>
+                            </html>"""
+        message['Subject'] = "BME VIK Mérnökinformatika 2025 - Hitelesítés"
         message['From'] = EMAIL
         message['To'] = to_email
-        message.set_charset('utf8')
+        message.add_alternative(html, subtype='html')
         email_server.send_message(message)
     return
