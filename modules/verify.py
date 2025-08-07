@@ -38,3 +38,25 @@ async def RemoveAuthCode(authCode: str):
         }
     )
     await client.disconnect()
+
+async def InsertInviteData(inviteeId: int, inviterId: int):
+    client = Client()
+    await client.connect()
+    await client.invite.create(
+        data={
+            'inviteeid': inviteeId,
+            'inviterId': inviterId
+        }
+    )
+    await client.disconnect()
+    
+async def RemoveInviteData(inviteeId: int, inviterId: int):
+    client = Client()
+    await client.connect()
+    await client.invite.delete(
+        where={
+            'inviteeid': inviteeId,
+            'inviterId': inviterId
+        }
+    )
+    await client.disconnect()
