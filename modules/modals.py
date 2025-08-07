@@ -1,9 +1,9 @@
 import disnake
 from disnake.ext import commands
 from disnake import TextInputStyle
-from verify import CheckAuthCode
-from smtp import SendAuthCode
-import variables
+from modules.verify import CheckAuthCode
+from email_utils.smtp import SendAuthCode
+import modules.variables as variables
 import re   
 
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
