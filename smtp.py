@@ -8,7 +8,7 @@ load_dotenv()
 
 port = 465
 context = ssl.create_default_context()
-EMAIL = "bme-indev@kadarmarcell.hu"
+EMAIL = "bme@kadarmarcell.hu"
 SMTP_PW = os.getenv("SMTP_PASSWORD")
 
 async def SendAuthCode(to_email: str):
