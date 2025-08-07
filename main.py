@@ -111,32 +111,44 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         await invitee.kick(reason="Declined by the inviter.")
     
     if (interaction.component.custom_id == "interest_car"):
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_CAR_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
         if invitee.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
-            await invitee.add_roles(variables.INTEREST_CAR_ROLE_ID)
+            await invitee.add_roles(role)
         else:
-            await invitee.remove_roles(variables.INTEREST_CAR_ROLE_ID)
+            await invitee.remove_roles(role)
     
     if (interaction.component.custom_id == "interest_game"):
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_GAME_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
         if invitee.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
-            await invitee.add_roles(variables.INTEREST_GAME_ROLE_ID)
+            await invitee.add_roles(role)
         else:
-            await invitee.remove_roles(variables.INTEREST_GAME_ROLE_ID)
+            await invitee.remove_roles(role)
     
     if (interaction.component.custom_id == "interest_shitpost"):
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_SHITPOST_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
         if invitee.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
-            await invitee.add_roles(variables.INTEREST_SHITPOST_ROLE_ID)
+            await invitee.add_roles(role)
         else:
-            await invitee.remove_roles(variables.INTEREST_SHITPOST_ROLE_ID)
+            await invitee.remove_roles(role)
 
     if (interaction.component.custom_id == "interest_music"):
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_MUSIC_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
         if invitee.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
-            await invitee.add_roles(variables.INTEREST_MUSIC_ROLE_ID)
+            await invitee.add_roles(role)
         else:
-            await invitee.remove_roles(variables.INTEREST_MUSIC_ROLE_ID)
+            await invitee.remove_roles(role)
 
 
 bot.run(BOT_TOKEN)
