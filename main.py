@@ -8,7 +8,7 @@ from modules import variables
 from modules.modals import VerificationFirstModal, VerificationSecondModal
 
 intents = disnake.Intents.all()
-bot = commands.InteractionBot(intents=intents)
+bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
 
 load_dotenv()
 
@@ -28,10 +28,17 @@ def BuildVerificationEmbed():
 def VerificationView():
     return
 
+global guild_invites
 guild_invites = None
 
 @bot.event
 async def on_ready():
+    global guild_invites
+    
+    for filename in os.listdir("./modules"):
+        if filename.endswith(".py") and filename.__contains__("cog"):
+            bot.load_extension(f"modules.{filename[:-3]}")
+
     is_vm_present = await IsVerificationMessagePresent()
     if is_vm_present == False:
         VerificationEmbed = BuildVerificationEmbed()
@@ -39,10 +46,10 @@ async def on_ready():
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_email")
         ])
     guild_invites = await bot.get_guild(variables.GUILD_ID).invites()
-
-
+    
 @bot.event
 async def on_member_join(member: disnake.Member):
+    global guild_invites
     invites_before = guild_invites
     invites_after = await member.guild.invites()
     used_invite = None
@@ -66,6 +73,10 @@ async def on_member_join(member: disnake.Member):
             disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
         ])
         
+
+@bot.slash_command(description="Multiplies the number by a multiplier")
+async def multiply(inter, number: int, multiplier: int = 7):
+    await inter.response.send_message(number * multiplier)
 
 @bot.listen("on_button_click")
 async def verification_listener(interaction: disnake.MessageInteraction):
