@@ -5,6 +5,7 @@ from modules.verify import CheckAuthCode
 from email_utils.smtp import SendAuthCode
 import modules.variables as variables
 import re   
+import modules.verify
 
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
 BME_MEMBER_ROLE_ID = variables.BME_MEMBER_ROLE_ID
@@ -86,7 +87,42 @@ class VerificationThirdModal(disnake.ui.Modal): # set nickname
         try:
             await interaction.author.edit(nick=new_nick)
             await interaction.response.send_message(f"A becenevedet a szerveren az általad megadott névre módosítottuk. Érezd jól magad a továbbiakban is **{new_nick}**!", ephemeral=True)
+            await modules.verify.RemoveInviteDataOnSuccessfulAuth(interaction.user.id)
         except disnake.Forbidden:
             await interaction.response.send_message(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!", ephemeral=True)
         except disnake.HTTPException as e:
             await interaction.response.send_message(f"O-ó... Nagy hiba van: {e}", ephemeral=True) 
+
+class GuestConfirmationModal(disnake.ui.Modal):
+    def __init__(self, inviterId, inviteeId):
+        self.inviterId = inviterId
+        self.inviteeId = inviteeId
+        
+        components = [
+            disnake.ui.TextInput(
+                label="Megerősítés",
+                placeholder="'IGEN' vagy 'NEM'",
+                custom_id="confirmation",
+                style=TextInputStyle.short,
+                max_length=4
+            )
+        ]
+        super().__init__(title="Megerősítés", components=components)
+
+    async def callback(self, interaction: disnake.ModalInteraction):
+        confirmation_value = interaction.text_values['confirmation'].upper()
+
+        match confirmation_value:
+            case 'IGEN':
+                embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{interaction.user.name}**(USERID: {interaction.user.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha BME tagot hívott meg!")
+                
+                inviter = interaction.guild.get_member(self.inviterId)
+                await inviter.send(embed=embed, components=[
+                    disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
+                    disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
+                ])
+
+                await interaction.response.send_message("Sikeres választás! Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!", ephemeral=True)
+                modules.verify.RemoveInviteData(self.inviteeId, self.inviterId)
+            case 'NEM':
+                await interaction.response.send_message("Sikeres választás!", ephemeral=True)

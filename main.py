@@ -5,7 +5,8 @@ import os
 import smtplib, ssl
 from email_utils import smtp
 from modules import variables
-from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal
+from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal, GuestConfirmationModal
+from modules.verify import InsertInviteData, GetInviteData
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
@@ -54,7 +55,8 @@ async def on_ready():
     if is_vm_present == False:
         VerificationEmbed = BuildVerificationEmbed()
         await bot.get_channel(variables.ENTRY_CHANNEL_ID).send(embed=VerificationEmbed, components=[
-            disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_email")
+            disnake.ui.Button(label="BME Tag", style=disnake.ButtonStyle.success, custom_id="verify_email"),
+            disnake.ui.Button(label="Vendég", style=disnake.ButtonStyle.success, custom_id="verify_guest")
         ])
     if is_it_present == False:
         InterestEmbed = BuildInterestEmbed()
@@ -83,14 +85,7 @@ async def on_member_join(member: disnake.Member):
 
     if used_invite:
         inviter = used_invite.inviter
-        def BuildGuestApprovalEmbed():
-            embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{member.name}**({member.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha BME tagot hívott meg!")
-            return embed
-        embed = BuildGuestApprovalEmbed()
-        await inviter.send(embed=embed, components=[
-            disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
-            disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
-        ])
+        InsertInviteData(member.id, inviter.id)
         
 
 @bot.slash_command(description="Multiplies the number by a multiplier")
@@ -103,6 +98,12 @@ async def verification_listener(interaction: disnake.MessageInteraction):
     match interaction.component.custom_id:
         case "verify_email":
             await interaction.response.send_modal(VerificationFirstModal())
+
+        case "verify_guest":
+            inviteeid = interaction.user.id
+            invite_data = await GetInviteData(interaction.user.id)
+            inviterid = invite_data.inviterid
+            await interaction.response.send_modal(GuestConfirmationModal(inviterid, inviteeid))
 
         case "verify_code":
             bme_email = interaction.message.content.split('`')[1]

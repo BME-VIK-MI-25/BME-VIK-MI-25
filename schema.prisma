@@ -12,3 +12,9 @@ model Auth {
   email     String
   authcode  Int @unique
 }
+
+model Invite {
+  id Int @id @default(autoincrement())
+  inviteeid Int
+  inviterid Int
+}
