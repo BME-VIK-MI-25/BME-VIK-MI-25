@@ -104,7 +104,6 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             invite_data = await GetInviteData(interaction.user.id)
             inviterid = invite_data.inviterid
             await interaction.response.send_modal(GuestConfirmationModal(inviterid, inviteeid))
-            return
 
         case "verify_code":
             bme_email = interaction.message.content.split('`')[1]
