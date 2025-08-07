@@ -100,69 +100,71 @@ async def multiply(inter, number: int, multiplier: int = 7):
 @bot.listen("on_button_click")
 async def verification_listener(interaction: disnake.MessageInteraction):
 
-    if (interaction.component.custom_id == "verify_email"):
-        await interaction.response.send_modal(VerificationFirstModal())
+    match interaction.component.custom_id:
+        case "verify_email":
+            await interaction.response.send_modal(VerificationFirstModal())
 
-    if (interaction.component.custom_id == "verify_code"):
-        bme_email = interaction.message.content.split('`')[1]
-        await interaction.response.send_modal(VerificationSecondModal(bme_email))
-        
-    if (interaction.component.custom_id == "start_nickname_modal"):
-        await interaction.response.send_modal(VerificationThirdModal())
+        case "verify_code":
+            bme_email = interaction.message.content.split('`')[1]
+            await interaction.response.send_modal(VerificationSecondModal(bme_email))
 
-    if (interaction.component.custom_id == "guest_verify"):
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
-        await invitee.add_roles(variables.NOT_BME_MEMBER_ROLE_ID)
-        await interaction.response.send_message("Sikeresen megerősítve!")
-        await invitee.send("A meghívó fél sikeresen megerősített!")
+        case "start_nickname_modal":
+            await interaction.response.send_modal(VerificationThirdModal())
 
-    if interaction.component.custom_id == "guest_deny":
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
-        await interaction.response.send_message("Sikeresen elutasítva!")
-        await invitee.send("A meghívó fél elutasított.")
-        await invitee.kick(reason="Declined by the inviter.")
-    
-    if (interaction.component.custom_id == "interest_car"):
-        guild = bot.get_guild(variables.GUILD_ID)
-        invitee = guild.get_member(interaction.author.id)
-        role = guild.get_role(variables.INTEREST_CAR_ROLE_ID) 
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
-        if invitee.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
-            await invitee.add_roles(role)
-        else:
-            await invitee.remove_roles(role)
-    
-    if (interaction.component.custom_id == "interest_game"):
-        guild = bot.get_guild(variables.GUILD_ID)
-        invitee = guild.get_member(interaction.author.id)
-        role = guild.get_role(variables.INTEREST_GAME_ROLE_ID) 
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
-        if invitee.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
-            await invitee.add_roles(role)
-        else:
-            await invitee.remove_roles(role)
-    
-    if (interaction.component.custom_id == "interest_shitpost"):
-        guild = bot.get_guild(variables.GUILD_ID)
-        invitee = guild.get_member(interaction.author.id)
-        role = guild.get_role(variables.INTEREST_SHITPOST_ROLE_ID) 
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
-        if invitee.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
-            await invitee.add_roles(role)
-        else:
-            await invitee.remove_roles(role)
+        case "guest_verify":
+            userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
+            invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+            await invitee.add_roles(variables.NOT_BME_MEMBER_ROLE_ID)
+            await interaction.response.send_message("Sikeresen megerősítve!")
+            await invitee.send("A meghívó fél sikeresen megerősített!")
 
-    if (interaction.component.custom_id == "interest_music"):
-        guild = bot.get_guild(variables.GUILD_ID)
-        invitee = guild.get_member(interaction.author.id)
-        role = guild.get_role(variables.INTEREST_MUSIC_ROLE_ID) 
-        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
-        if invitee.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
-            await invitee.add_roles(role)
-        else:
-            await invitee.remove_roles(role)
+        case "guest_deny":
+            userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
+            invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+            await interaction.response.send_message("Sikeresen elutasítva!")
+            await invitee.send("A meghívó fél elutasított.")
+            await invitee.kick(reason="Declined by the inviter.")
+
+        case "interest_car":
+            user = interaction.guild.get_member(interaction.user.id)
+            role = interaction.guild.get_role(variables.INTEREST_CAR_ROLE_ID) 
+            if user.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
+                await user.add_roles(role)
+                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
+            else:
+                await user.remove_roles(role)
+                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
+
+        case "interest_game":
+            user = interaction.guild.get_member(interaction.user.id)
+            role = interaction.guild.get_role(variables.INTEREST_GAME_ROLE_ID) 
+            if user.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
+                await user.add_roles(role)
+                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
+            else:
+                await user.remove_roles(role)
+                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
+
+        case "interest_shitpost":
+            user = interaction.guild.get_member(interaction.user.id)
+            role = interaction.guild.get_role(variables.INTEREST_SHITPOST_ROLE_ID) 
+            if user.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
+                await user.add_roles(role)
+                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
+            else:
+                await user.remove_roles(role)
+                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
+
+        case "interest_music":
+            user = interaction.guild.get_member(interaction.user.id)
+            role = interaction.guild.get_role(variables.INTEREST_MUSIC_ROLE_ID)
+            if user.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
+                await user.add_roles(role)
+                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
+            else:
+                await user.remove_roles(role)
+                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
+
 
 
 bot.run(BOT_TOKEN)
