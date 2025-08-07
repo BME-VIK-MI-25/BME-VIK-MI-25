@@ -3,3 +3,4 @@ python-dotenv
 prisma-client
 pydantic<2
 requests
+beautifulsoup4
