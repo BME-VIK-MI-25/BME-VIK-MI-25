@@ -1,4 +1,4 @@
-from verify import CreateAuthCode
+from modules.verify import CreateAuthCode
 import smtplib, ssl
 from dotenv import load_dotenv
 from email.message import EmailMessage

@@ -1,5 +1,7 @@
 .env
 /__pycache__
+/email_utils/__pycache__
+/modules/__pycache__
 *.db
 .envindev
 /venv

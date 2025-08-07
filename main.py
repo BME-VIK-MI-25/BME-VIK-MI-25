@@ -3,9 +3,9 @@ from disnake.ext import commands
 from dotenv import load_dotenv
 import os
 import smtplib, ssl
-import smtp
-import variables
-from modals import VerificationFirstModal, VerificationSecondModal
+from email_utils import smtp
+from modules import variables
+from modules.modals import VerificationFirstModal, VerificationSecondModal
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents)
