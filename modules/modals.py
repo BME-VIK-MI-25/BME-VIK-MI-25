@@ -62,7 +62,31 @@ class VerificationSecondModal(disnake.ui.Modal):
             await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
             bme_role = inter.guild.get_role(BME_MEMBER_ROLE_ID)
             await inter.user.add_roles(bme_role)
-            await inter.response.send_message("Sikeres hitelesítés!", ephemeral=True)
+            await inter.response.send_message("Sikeres hitelesítés! Kérlek add meg a beceneved", components=[
+            disnake.ui.Button(label="Becenév megadása", style=disnake.ButtonStyle.success, custom_id="start_nickname_modal")], ephemeral=True)
         else:
             await inter.response.send_message("A megadott hitelesítő kód rossz.", ephemeral=True)
         return
+    
+class VerificationThirdModal(disnake.ui.Modal): # set nickname
+    def __init__(self):
+        components = [
+            disnake.ui.TextInput(
+                label="Becenév megadása",
+                placeholder="Becenév",
+                custom_id="nickname",
+                style=disnake.TextInputStyle.short,
+                max_length=32,
+            )
+        ]
+        super().__init__(title="Becenév beállítása", components=components, custom_id="nickname_modal")
+        
+    async def callback(self, interaction: disnake.ModalInteraction):
+        new_nick = interaction.text_values["nickname"]
+        try:
+            await interaction.author.edit(nick=new_nick)
+            await interaction.response.send_message(f"A becenevedet a szerveren az általad megadott névre módosítottuk. Érezd jól magad a továbbiakban is **{new_nick}**!", ephemeral=True)
+        except disnake.Forbidden:
+            await interaction.response.send_message(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!", ephemeral=True)
+        except disnake.HTTPException as e:
+            await interaction.response.send_message(f"O-ó... Nagy hiba van: {e}", ephemeral=True) 
