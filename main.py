@@ -28,6 +28,8 @@ def BuildVerificationEmbed():
 def VerificationView():
     return
 
+guild_invites = None
+
 @bot.event
 async def on_ready():
     is_vm_present = await IsVerificationMessagePresent()
@@ -36,6 +38,34 @@ async def on_ready():
         await bot.get_channel(variables.ENTRY_CHANNEL_ID).send(embed=VerificationEmbed, components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_email")
         ])
+    guild_invites = await bot.get_guild(variables.GUILD_ID).invites()
+
+
+@bot.event
+async def on_member_join(member: disnake.Member):
+    invites_before = guild_invites
+    invites_after = await member.guild.invites()
+    used_invite = None
+    for before_invite in invites_before:
+        for after_invite in invites_after:
+            if before_invite.code == after_invite.code:
+                if after_invite.uses > before_invite.uses:
+                    used_invite = after_invite
+                    break
+    
+    guild_invites = invites_after
+
+    if used_invite:
+        inviter = used_invite.inviter
+        def BuildGuestApprovalEmbed():
+            embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{member.name}**({member.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha BME tagot hívott meg!")
+            return embed
+        embed = BuildGuestApprovalEmbed()
+        await inviter.send(embed=embed, components=[
+            disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
+            disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
+        ])
+        
 
 @bot.listen("on_button_click")
 async def verification_listener(interaction: disnake.MessageInteraction):
@@ -46,5 +76,20 @@ async def verification_listener(interaction: disnake.MessageInteraction):
     if (interaction.component.custom_id == "verify_code"):
         bme_email = interaction.message.content.split('`')[1]
         await interaction.response.send_modal(VerificationSecondModal(bme_email))
+
+    if (interaction.component.custom_id == "guest_verify"):
+        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        await invitee.add_roles(variables.NOT_BME_MEMBER_ROLE_ID)
+        await interaction.response.send_message("Sikeresen megerősítve!")
+        await invitee.send("A meghívó fél sikeresen megerősített!")
+
+    if interaction.component.custom_id == "guest_deny":
+        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+        await interaction.response.send_message("Sikeresen elutasítva!")
+        await invitee.send("A meghívó fél elutasított.")
+        await invitee.kick(reason="Declined by the inviter.")
+
 
 bot.run(BOT_TOKEN)
