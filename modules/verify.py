@@ -49,7 +49,17 @@ async def InsertInviteData(inviteeId: int, inviterId: int):
         }
     )
     await client.disconnect()
-    
+
+async def GetInviteData(inviteeId: int):
+    client = Client()
+    await client.connect()
+    await client.invite.find_first(
+        where={
+            'inviteeid': inviteeId
+        }
+    )
+    await client.disconnect()
+
 async def RemoveInviteData(inviteeId: int, inviterId: int):
     client = Client()
     await client.connect()
@@ -57,6 +67,16 @@ async def RemoveInviteData(inviteeId: int, inviterId: int):
         where={
             'inviteeid': inviteeId,
             'inviterId': inviterId
+        }
+    )
+    await client.disconnect()
+
+async def RemoveInviteDataOnSuccessfulAuth(inviteeId: int):
+    client = Client()
+    await client.connect()
+    await client.invite.delete(
+        where={
+            'inviteeid': inviteeId
         }
     )
     await client.disconnect()
