@@ -52,10 +52,10 @@ async def on_ready():
     if is_it_present == False:
         InterestEmbed = BuildInterestEmbed()
         await bot.get_channel(variables.INTEREST_CHANNEL_ID).send(embed=InterestEmbed, components=[
-            disnake.ui.Button(label="Autók", style=disnake.ButtonStyle.success, custom_id="intrest_car"),
+            disnake.ui.Button(label="Autók", style=disnake.ButtonStyle.success, custom_id="interest_car"),
             disnake.ui.Button(label="Játékok", style=disnake.ButtonStyle.success, custom_id="interest_game"),
-            disnake.ui.Button(label="Shit-Post", style=disnake.ButtonStyle.success, custom_id="intrest_shitpost"),
-            disnake.ui.Button(label="Zenék", style=disnake.ButtonStyle.success, custom_id="intrest_music"),
+            disnake.ui.Button(label="Shit-Post", style=disnake.ButtonStyle.success, custom_id="interest_shitpost"),
+            disnake.ui.Button(label="Zenék", style=disnake.ButtonStyle.success, custom_id="interest_music"),
         ])
     guild_invites = await bot.get_guild(variables.GUILD_ID).invites()
 
@@ -110,7 +110,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         await invitee.send("A meghívó fél elutasított.")
         await invitee.kick(reason="Declined by the inviter.")
     
-    if (interaction.component.custom_id == "intrest_car"):
+    if (interaction.component.custom_id == "interest_car"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
@@ -118,7 +118,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         else:
             await invitee.remove_roles(variables.INTEREST_CAR_ROLE_ID)
     
-    if (interaction.component.custom_id == "intrest_game"):
+    if (interaction.component.custom_id == "interest_game"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
@@ -126,7 +126,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         else:
             await invitee.remove_roles(variables.INTEREST_GAME_ROLE_ID)
     
-    if (interaction.component.custom_id == "intrest_shitpost"):
+    if (interaction.component.custom_id == "interest_shitpost"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
@@ -134,7 +134,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         else:
             await invitee.remove_roles(variables.INTEREST_SHITPOST_ROLE_ID)
 
-    if (interaction.component.custom_id == "intrest_music"):
+    if (interaction.component.custom_id == "interest_music"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
