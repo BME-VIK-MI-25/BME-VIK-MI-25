@@ -5,7 +5,7 @@ import os
 import smtplib, ssl
 from email_utils import smtp
 from modules import variables
-from modules.modals import VerificationFirstModal, VerificationSecondModal
+from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
@@ -21,8 +21,18 @@ async def IsVerificationMessagePresent():
         return False
     return True
 
+async def IsInterestMessagePresent():
+    last_message = await bot.get_channel(variables.INTEREST_CHANNEL_ID).history(limit = 1).flatten()
+    is_empty = len(last_message) == 0
+    if is_empty or last_message[0].author != bot.user:
+        return False
+    return True
+
 def BuildVerificationEmbed():
-    embed = disnake.Embed(title="Hitelesítés", description="Hogy hozzáférést szerezz a szerver többi részéhez, kérlek hitelesítsd fiókod!\n\nHogy ezt megtedd, az üzenet alatt lévő gombra nyomj rá, majd a [NEVED]@edu.bme.hu emailcímedet add meg. Ezt [itt](https://login.bme.hu/admin/username) találhatod!\nEzt követően erre az email címre(Outlook) kapsz egy kódot, amelyet meg kell adnod.", color=disnake.Color.dark_red())
+    embed = disnake.Embed(title="Hitelesítés", description="Ahhoz hogy csatlakozhass a közösségünkhöz, kérlek hitelesítsd fiókod!\n\nAz üzenet alatti gombra kattintva, majd a [NEVED]@edu.bme.hu emailcímedet megadva kezdheted ezt meg. Emailcímet [ezen a linken](https://login.bme.hu/admin/username) tudsz igényelni, ha még esetleg nem tetted..\nA megerősítéshez az (Outlook-os) emailcímedre érkező kódra lesz szükséged.", color=disnake.Color.dark_red())
+    return embed
+def BuildInterestEmbed():
+    embed = disnake.Embed(title="Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? Az autók? A játékok? Esetleg a mémek? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
     return embed
 
 def VerificationView():
@@ -40,10 +50,19 @@ async def on_ready():
             bot.load_extension(f"modules.{filename[:-3]}")
 
     is_vm_present = await IsVerificationMessagePresent()
+    is_it_present = await IsInterestMessagePresent()
     if is_vm_present == False:
         VerificationEmbed = BuildVerificationEmbed()
         await bot.get_channel(variables.ENTRY_CHANNEL_ID).send(embed=VerificationEmbed, components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_email")
+        ])
+    if is_it_present == False:
+        InterestEmbed = BuildInterestEmbed()
+        await bot.get_channel(variables.INTEREST_CHANNEL_ID).send(embed=InterestEmbed, components=[
+            disnake.ui.Button(label="Autók", style=disnake.ButtonStyle.success, custom_id="interest_car"),
+            disnake.ui.Button(label="Játékok", style=disnake.ButtonStyle.success, custom_id="interest_game"),
+            disnake.ui.Button(label="Shit-Post", style=disnake.ButtonStyle.success, custom_id="interest_shitpost"),
+            disnake.ui.Button(label="Zenék", style=disnake.ButtonStyle.success, custom_id="interest_music"),
         ])
     guild_invites = await bot.get_guild(variables.GUILD_ID).invites()
     
@@ -87,6 +106,9 @@ async def verification_listener(interaction: disnake.MessageInteraction):
     if (interaction.component.custom_id == "verify_code"):
         bme_email = interaction.message.content.split('`')[1]
         await interaction.response.send_modal(VerificationSecondModal(bme_email))
+        
+    if (interaction.component.custom_id == "start_nickname_modal"):
+        await interaction.response.send_modal(VerificationThirdModal())
 
     if (interaction.component.custom_id == "guest_verify"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
@@ -101,6 +123,46 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         await interaction.response.send_message("Sikeresen elutasítva!")
         await invitee.send("A meghívó fél elutasított.")
         await invitee.kick(reason="Declined by the inviter.")
+    
+    if (interaction.component.custom_id == "interest_car"):
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_CAR_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
+        if invitee.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
+            await invitee.add_roles(role)
+        else:
+            await invitee.remove_roles(role)
+    
+    if (interaction.component.custom_id == "interest_game"):
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_GAME_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
+        if invitee.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
+            await invitee.add_roles(role)
+        else:
+            await invitee.remove_roles(role)
+    
+    if (interaction.component.custom_id == "interest_shitpost"):
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_SHITPOST_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
+        if invitee.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
+            await invitee.add_roles(role)
+        else:
+            await invitee.remove_roles(role)
+
+    if (interaction.component.custom_id == "interest_music"):
+        guild = bot.get_guild(variables.GUILD_ID)
+        invitee = guild.get_member(interaction.author.id)
+        role = guild.get_role(variables.INTEREST_MUSIC_ROLE_ID) 
+        invitee = bot.get_guild(variables.GUILD_ID).get_member(interaction.author.id)
+        if invitee.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
+            await invitee.add_roles(role)
+        else:
+            await invitee.remove_roles(role)
 
 
 bot.run(BOT_TOKEN)
