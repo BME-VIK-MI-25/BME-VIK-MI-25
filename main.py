@@ -5,7 +5,7 @@ import os
 import smtplib, ssl
 from email_utils import smtp
 from modules import variables
-from modules.modals import VerificationFirstModal, VerificationSecondModal
+from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents)
@@ -95,6 +95,9 @@ async def verification_listener(interaction: disnake.MessageInteraction):
     if (interaction.component.custom_id == "verify_code"):
         bme_email = interaction.message.content.split('`')[1]
         await interaction.response.send_modal(VerificationSecondModal(bme_email))
+        
+    if (interaction.component.custom_id == "start_nickname_modal"):
+        await interaction.response.send_modal(VerificationThirdModal())
 
     if (interaction.component.custom_id == "guest_verify"):
         userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
