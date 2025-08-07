@@ -111,7 +111,6 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         await invitee.kick(reason="Declined by the inviter.")
     
     if (interaction.component.custom_id == "interest_car"):
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
             await invitee.add_roles(variables.INTEREST_CAR_ROLE_ID)
@@ -119,7 +118,6 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             await invitee.remove_roles(variables.INTEREST_CAR_ROLE_ID)
     
     if (interaction.component.custom_id == "interest_game"):
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
             await invitee.add_roles(variables.INTEREST_GAME_ROLE_ID)
@@ -127,7 +125,6 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             await invitee.remove_roles(variables.INTEREST_GAME_ROLE_ID)
     
     if (interaction.component.custom_id == "interest_shitpost"):
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
             await invitee.add_roles(variables.INTEREST_SHITPOST_ROLE_ID)
@@ -135,7 +132,6 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             await invitee.remove_roles(variables.INTEREST_SHITPOST_ROLE_ID)
 
     if (interaction.component.custom_id == "interest_music"):
-        userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
         invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
         if invitee.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
             await invitee.add_roles(variables.INTEREST_MUSIC_ROLE_ID)
