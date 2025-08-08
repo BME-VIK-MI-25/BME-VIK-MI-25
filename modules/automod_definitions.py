@@ -86,3 +86,21 @@ async def GetBannedWordCount(userId: int):
     await client.connect()
     res = client.blacklistedwordcounter.find_first(where = {'userId':userId})
     return res.count
+
+async def UpdateBanExpiry(user_id: int, ban_expiry):
+    client = Client()
+    await client.connect()
+    data = {
+        'userId': user_id,
+        'BanExpiry': ban_expiry
+    }
+    await client.bannedinviters.create(data)
+    await client.disconnect()
+
+async def GetBanExpiries():
+    client = Client()
+    await client.connect()
+    res = await client.bannedinviters.find_many()
+    await client.disconnect()
+    return res
+    
