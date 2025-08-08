@@ -7,6 +7,8 @@ from email_utils import smtp
 from modules import variables
 from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal, GuestConfirmationModal
 from modules.verify import InsertInviteData, GetInviteData
+import logging
+import modules.logging_config as logging_config
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
@@ -36,7 +38,7 @@ def BuildVerificationEmbed():
         color=disnake.Color.dark_red()
     )
 
-    embed.set_thumbnail(url=LOGO_VIK) #VIK logo
+    embed.set_thumbnail(url=variables.LOGO_VIK) #VIK logo
 
     embed.add_field(
         name="📧 1. Add meg az e-mail címed",
@@ -58,7 +60,7 @@ def BuildVerificationEmbed():
 
 def BuildInterestEmbed():
     embed = disnake.Embed(title="🎯 Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? 🚗 **Autók**? 🎮 **Játékok**? 🤣 **Mémek**? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
-    embed.set_thumbnail(url=LOGO_HOBBY)
+    embed.set_thumbnail(url=variables.LOGO_HOBBY)
     return embed
 
 def VerificationView():
@@ -72,7 +74,7 @@ guild_invites = None
 @bot.event
 async def on_ready():
     global guild_invites
-    
+    logging.info('Starting up...')
     for filename in os.listdir("./modules"):
         if filename.endswith(".py") and filename.__contains__("cog"):
             bot.load_extension(f"modules.{filename[:-3]}")
