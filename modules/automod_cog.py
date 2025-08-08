@@ -35,6 +35,9 @@ class AutoMod(commands.Cog):
         for record in automod_definitions.GetBanExpiries():
             if record.BanExpiry < datetime.now():
                 userid = record.userId
+                
+                await automod_definitions.DeleteBanExpiry(userid)
+
                 guild = self.bot.get_guild(variables.GUILD_ID)
                 member = guild.get_member(userid)
                 role = guild.get_role(variables.BME_MEMBER_NOINVITE_ROLE_ID) 
