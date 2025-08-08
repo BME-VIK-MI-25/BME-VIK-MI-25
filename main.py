@@ -38,7 +38,7 @@ def BuildVerificationEmbed():
         color=disnake.Color.dark_red()
     )
 
-    embed.set_thumbnail(url=LOGO_VIK) #VIK logo
+    embed.set_thumbnail(url=variables.LOGO_VIK) #VIK logo
 
     embed.add_field(
         name="📧 1. Add meg az e-mail címed",
@@ -60,7 +60,7 @@ def BuildVerificationEmbed():
 
 def BuildInterestEmbed():
     embed = disnake.Embed(title="🎯 Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? 🚗 **Autók**? 🎮 **Játékok**? 🤣 **Mémek**? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
-    embed.set_thumbnail(url=LOGO_HOBBY)
+    embed.set_thumbnail(url=variables.LOGO_HOBBY)
     return embed
 
 def VerificationView():

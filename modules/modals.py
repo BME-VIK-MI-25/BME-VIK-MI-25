@@ -99,8 +99,7 @@ class VerificationThirdModal(disnake.ui.Modal): # set nickname
         except disnake.Forbidden:
             await interaction.response.send_message(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!", ephemeral=True)
         except disnake.HTTPException as e:
-            devrole = guild.get_role(DEVELOPER_ROLE_ID)
-            await interaction.response.send_message(f"Hiba történt! Keresd fel a {devrole.mention}", ephemeral=True) 
+            await interaction.response.send_message(f"Hiba történt! Keresd fel a fejlesztőket!", ephemeral=True) 
             logging.error(f'Nickname change error for: {interaction.user.name}\n{e}')
 
 class GuestConfirmationModal(disnake.ui.Modal):
