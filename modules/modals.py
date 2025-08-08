@@ -12,7 +12,7 @@ import modules.logging_config as logging_config
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
 BME_MEMBER_ROLE_ID = variables.BME_MEMBER_ROLE_ID
 
-def BuildGuestConfirmEmbed():
+def BuildGuestConfirmEmbed(interaction):
     embed = disnake.Embed(title=f"Ezt a felhasználót te hívtad meg?", description=f"Felhasználónév: **{interaction.user.name}** ({interaction.user.id})\n\nVedd ezt az üzenetet figyelmen kívül, ha **BME** tagot hívtál meg!", color=disnake.Color.dark_red())
     return embed
 
@@ -123,7 +123,7 @@ class GuestConfirmationModal(disnake.ui.Modal):
 
         match confirmation_value:
             case 'IGEN':
-                embed = BuildGuestConfirmEmbed()
+                embed = BuildGuestConfirmEmbed(interaction)
                 
                 inviter = interaction.guild.get_member(self.inviterId)
                 await inviter.send(embed=embed, components=[
