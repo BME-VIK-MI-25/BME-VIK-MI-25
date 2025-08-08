@@ -26,7 +26,7 @@ model BlacklistedWords {
 
 model BlacklistedWordCounter {
   id Int @id @default(autoincrement())
-  userId Int
+  userId Int @unique
   count Int
 }
 
