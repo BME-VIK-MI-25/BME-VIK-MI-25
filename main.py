@@ -115,7 +115,7 @@ async def on_member_join(member: disnake.Member):
     if used_invite:
         inviter = used_invite.inviter
         InsertInviteData(member.id, inviter.id)
-        
+
 
 @bot.slash_command(description="Multiplies the number by a multiplier")
 async def multiply(inter, number: int, multiplier: int = 7):
