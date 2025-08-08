@@ -59,22 +59,42 @@ class AutoMod(commands.Cog):
     async def banwords(self, inter: disnake. ApplicationCommandInteraction, words: str=commands.Param(description="Vesszővel(,) válazd el!")):
         await automod_definitions.InsertBannedWord(words)
         await inter.response.send_message(f"{words} sikeresen tiltva.", ephemeral=True)
-                
+
+
     @commands.slash_command(description="List invite banned users.")
+    @commands.has_permissions(manage_roles=True)
     async def listbans(self, inter: disnake.ApplicationCommandInteraction):
-        guild = self.bot.get_guild(variables.GUILD_ID)
         embed = disnake.Embed(
             title="Invite bannolt userek:",
             description="",
             color=disnake.Color.red()
         )  
-        
         bans = await automod_definitions.GetBanExpiries()
-        osszes = []
         for ban in bans:
             member = await self.bot.fetch_user(ban.userId)
             name = member.name
             embed.description += f'{member.name} {str(ban.BanExpiry.replace(tzinfo=None))[:-7]}\n'
+        await inter.response.send_message(embed=embed)
+    
+    @commands.slash_command(description="List banned words")
+    @commands.has_permissions(manage_roles=True)
+    async def listwords(self, inter: disnake.ApplicationCommandInteraction):
+        words = await automod_definitions.GetBannedWordList()
+        embed = disnake.Embed(
+            title=f'Bannolt szavak({len(words)}):',
+            description="",
+            color=disnake.Color.blurple()
+        )
+        if len(words) == 0:
+            embed = disnake.Embed(
+            title="Nincsenek még bannolt szavak!",
+            description="",
+            color=disnake.Color.red()
+            )
+            await inter.response.send_message(embed=embed)        
+            return
+        for word in words:
+            embed.description += f'{word}\n'
         await inter.response.send_message(embed=embed)
 
 
