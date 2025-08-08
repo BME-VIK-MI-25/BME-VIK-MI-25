@@ -18,3 +18,8 @@ model Invite {
   inviteeid Int
   inviterid Int
 }
+
+model BlacklistedWords {
+  id Int @id @default(autoincrement())
+  word String
+}

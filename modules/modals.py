@@ -132,6 +132,5 @@ class GuestConfirmationModal(disnake.ui.Modal):
                 ])
 
                 await interaction.response.send_message("Sikeres választás! Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!", ephemeral=True)
-                modules.verify.RemoveInviteData(self.inviteeId, self.inviterId)
             case 'NEM':
                 await interaction.response.send_message("Sikeres választás!", ephemeral=True)
