@@ -123,8 +123,9 @@ async def multiply(inter, number: int, multiplier: int = 7):
 
 @bot.listen("on_button_click")
 async def verification_listener(interaction: disnake.MessageInteraction):
+    CUSTOM_ID = interaction.component.custom_id
 
-    match interaction.component.custom_id:
+    match CUSTOM_ID:
         case "verify_email":
             await interaction.response.send_modal(VerificationFirstModal())
 
@@ -155,46 +156,17 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             await invitee.send("A meghívó fél elutasított.")
             await invitee.kick(reason="Declined by the inviter.")
 
-        case "interest_car":
-            user = interaction.guild.get_member(interaction.user.id)
-            role = interaction.guild.get_role(variables.INTEREST_CAR_ROLE_ID) 
-            if user.get_role(variables.INTEREST_CAR_ROLE_ID) == None:
-                await user.add_roles(role)
-                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
-            else:
-                await user.remove_roles(role)
-                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
-
-        case "interest_game":
-            user = interaction.guild.get_member(interaction.user.id)
-            role = interaction.guild.get_role(variables.INTEREST_GAME_ROLE_ID) 
-            if user.get_role(variables.INTEREST_GAME_ROLE_ID) == None:
-                await user.add_roles(role)
-                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
-            else:
-                await user.remove_roles(role)
-                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
-
-        case "interest_shitpost":
-            user = interaction.guild.get_member(interaction.user.id)
-            role = interaction.guild.get_role(variables.INTEREST_SHITPOST_ROLE_ID) 
-            if user.get_role(variables.INTEREST_SHITPOST_ROLE_ID) == None:
-                await user.add_roles(role)
-                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
-            else:
-                await user.remove_roles(role)
-                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
-
-        case "interest_music":
-            user = interaction.guild.get_member(interaction.user.id)
-            role = interaction.guild.get_role(variables.INTEREST_MUSIC_ROLE_ID)
-            if user.get_role(variables.INTEREST_MUSIC_ROLE_ID) == None:
-                await user.add_roles(role)
-                await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
-            else:
-                await user.remove_roles(role)
-                await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
-
+        case _:
+            if CUSTOM_ID.__contains__("interest") or CUSTOM_ID.__contains__("role"):
+                user = interaction.guild.get_member(interaction.user.id)
+                role_id = variables.CUSTOMID_ROLE_PAIRS[CUSTOM_ID]
+                role = interaction.guild.get_role(role_id) 
+                if user.get_role(role_id) == None:
+                    await user.add_roles(role)
+                    await interaction.response.send_message("Megkaptad a kiválasztott rangod.", ephemeral=True)
+                else:
+                    await user.remove_roles(role)
+                    await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
 
 
 bot.run(BOT_TOKEN)
