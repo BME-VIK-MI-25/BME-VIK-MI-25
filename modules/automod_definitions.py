@@ -15,7 +15,7 @@ async def InsertBannedWord(word: str):
     except prisma.errors.ClientNotConnectedError:
         return "Kapcsolódási hiba, a beszúrás nem történt meg."
 
-async def GetBannedWordList(word: str):
+async def GetBannedWordList():
     client = Client()    
     await client.connect()    
     result = await client.blacklistedwords.find_many()
