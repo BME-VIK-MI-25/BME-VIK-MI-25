@@ -59,8 +59,10 @@ class AutoMod(commands.Cog):
     async def banwords(self, inter: disnake. ApplicationCommandInteraction, words: str=commands.Param(description="Vesszővel(,) válazd el!")):
         await automod_definitions.InsertBannedWord(words)
         await inter.response.send_message(f"{words} sikeresen tiltva.", ephemeral=True)
-                
+
+
     @commands.slash_command(description="List invite banned users.")
+    @commands.has_permissions(manage_roles=True)
     async def listbans(self, inter: disnake.ApplicationCommandInteraction):
         guild = self.bot.get_guild(variables.GUILD_ID)
         embed = disnake.Embed(
@@ -76,7 +78,11 @@ class AutoMod(commands.Cog):
             name = member.name
             embed.description += f'{member.name} {str(ban.BanExpiry.replace(tzinfo=None))[:-7]}\n'
         await inter.response.send_message(embed=embed)
-
+    
+    @commands.slash_command(description="List banned words")
+    @commands.has_permissions(manage_roles=True)
+    async def listwords(self, inter: disnake.ApplicationCommandInteraction):
+        pass
 
 
 def setup(bot):
