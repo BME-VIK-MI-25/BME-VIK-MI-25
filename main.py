@@ -49,7 +49,7 @@ def BuildVerificationEmbed():
 
     embed.add_field(
         name="📬 2. Ellenőrizd az e-mailjeidet",
-        value="Erre az email címedre az Outlook-on érzkezik egy kód, amit a következő lépésben kell megadnod.",
+        value="Erre az e-mail címedre az Outlook-on érzkezik egy kód, amit a következő lépésben kell megadnod.",
         inline=False
     )
 
