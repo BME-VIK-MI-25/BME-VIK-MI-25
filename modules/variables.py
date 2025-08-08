@@ -12,3 +12,4 @@ INTEREST_MUSIC_ROLE_ID = 1403049967043743805
 
 #Logos and stuff
 LOGO_VIK = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/logo2.png"
+LOGO_HOBBY = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/hobby_blue.png"

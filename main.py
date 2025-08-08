@@ -58,7 +58,7 @@ def BuildVerificationEmbed():
 
 def BuildInterestEmbed():
     embed = disnake.Embed(title="🎯 Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? 🚗 **Autók**? 🎮 **Játékok**? 🤣 **Mémek**? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
-    embed.set_thumbnail(url="https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/hobby_blue.png")
+    embed.set_thumbnail(url=LOGO_HOBBY)
     return embed
 
 def VerificationView():
