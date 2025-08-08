@@ -1,18 +1,40 @@
 from prisma import Client
 import prisma 
+async def InsertBannedWords(words: list[str]):
+    try:
+        client = Client()    
+        await client.connect()    
+        for el in words:
+            await client.blacklistedwords.create(
+                data = {
+                    'word': el
+                }
+            )
+        await client.disconnect()
+        return True
+    except prisma.errors.DataError:
+        await client.disconnect()
+        return "Hibás adatok, a beszúrás nem történt meg."
+    except prisma.errors.ClientNotConnectedError:
+        await client.disconnect()
+        return "Kapcsolódási hiba, a beszúrás nem történt meg."
+    
 async def InsertBannedWord(word: str):
     try:
         client = Client()    
         await client.connect()    
         await client.blacklistedwords.create(
             data = {
-                word: word
+                'word': word
             }
         )
+        await client.disconnect()
         return True
     except prisma.errors.DataError:
+        await client.disconnect()
         return "Hibás adatok, a beszúrás nem történt meg."
     except prisma.errors.ClientNotConnectedError:
+        await client.disconnect()
         return "Kapcsolódási hiba, a beszúrás nem történt meg."
 
 async def GetBannedWordList():
@@ -20,6 +42,7 @@ async def GetBannedWordList():
     await client.connect()    
     result = await client.blacklistedwords.find_many()
     words = [res.word for res in result]
+    await client.disconnect()
     return words
 
 async def RemoveBannedWord(word: str):
@@ -27,9 +50,10 @@ async def RemoveBannedWord(word: str):
     await client.connect()    
     await client.blacklistedwords.delete(
         where = {
-            word: word
+            'word': word
         }
     )
+    await client.disconnect()
     return
 
 async def CheckBannedWord(message: str):
