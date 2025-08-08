@@ -35,7 +35,7 @@ class VerificationFirstModal(disnake.ui.Modal):
             return
         await inter.response.defer(ephemeral=True)
         await SendAuthCode(bme_email)
-        await inter.edit_original_response(f'Megadott email cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az emailjeid között, kérlek nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
+        await inter.edit_original_response(f'Megadott email cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az emailjeid között, nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_code")
         ])
         return
