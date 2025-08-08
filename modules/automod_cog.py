@@ -20,7 +20,7 @@ class AutoMod(commands.Cog):
         if BannedWordCount >= variables.BannedWordCountThreshold:
             await message.guild.ban(message.author, reason="Bannolt szavak használata")
             inviter = await verify.GetInviteData(message.author.id)
-            
+
             role = message.guild.get_role(variables.BME_MEMBER_NOINVITE_ROLE_ID) 
             await inviter.add_roles(role)
 
@@ -29,7 +29,7 @@ class AutoMod(commands.Cog):
             await automod_definitions.UpdateBanExpiry(message.author.id,datetime.now()+timedelta(days=7))
         # Handle banned word count checking, invitee and invite bans
     
-    @tasks.loop(min=3) # Öt vagy egy perc? Feri: Három
+    @tasks.loop(seconds=180) # Öt vagy egy perc? Feri: Három
     async def AutoCheckInviteBans(self):
         for record in automod_definitions.GetBanExpiries():
             if record.BanExpiry < datetime.now():
