@@ -107,6 +107,5 @@ async def GetBanExpiries():
 async def DeleteBanExpiry(user_id: int):
     client = Client()
     await client.connect()
-    where = {'userId' : user_id}
-    await client.bannedinviters.delete(data)
+    await client.bannedinviters.delete(where={'userId' : user_id})
     await client.disconnect
