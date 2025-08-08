@@ -13,7 +13,7 @@ class VerificationFirstModal(disnake.ui.Modal):
     def __init__(self):
         components = [
             disnake.ui.TextInput(
-                label="BME E-Mail Cím",
+                label="BME Email Cím",
                 placeholder="XYZ@edu.bme.hu",
                 custom_id="bme_email",
                 style=TextInputStyle.short,
@@ -25,17 +25,17 @@ class VerificationFirstModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction):
         bme_email = inter.text_values['bme_email']
         if re.match(".*@edu\.bme\.hu", bme_email) == None:
-            await inter.response.send_message("A megadott E-Mail formátum nem megfelelő. Kötelező domain: `edu.bme.hu`", ephemeral=True)
+            await inter.response.send_message("A megadott email formátum nem megfelelő. Kötelező domain: `edu.bme.hu`", ephemeral=True)
             return
         await inter.response.defer(ephemeral=True)
         await SendAuthCode(bme_email)
-        await inter.edit_original_response(f'Megadott email cím:\`**{bme_email}**\`(Ha a kód nem jelen meg az emaileid között, kérlek nézd meg a spam között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
+        await inter.edit_original_response(f'Megadott email cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az emailjeid között, kérlek nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_code")
         ])
         return
     
 def WelcomeEmbed(guildName):
-    embed = disnake.Embed(title=f"Üdvözöljük a {guildName} szerveren!", description=f"Ne felejtsd el meglátogatni a <#{ROLES_CHANNEL_ID}> csatornát, hogy a rolejaidat átvedd, és a szabályzatokat elolvasd!", color=disnake.Color.dark_red())
+    embed = disnake.Embed(title=f"Üdvözlünk a {guildName} szerveren!", description=f"Ne felejtsd el meglátogatni a <#{ROLES_CHANNEL_ID}> csatornát, hogy a rolejaidat átvedd!", color=disnake.Color.dark_red())
     return embed
 
 class VerificationSecondModal(disnake.ui.Modal):
@@ -114,7 +114,7 @@ class GuestConfirmationModal(disnake.ui.Modal):
 
         match confirmation_value:
             case 'IGEN':
-                embed = disnake.Embed(title=f"A következő felhasználót ön hívta meg?", description=f"Felhasználónév: **{interaction.user.name}**(USERID: {interaction.user.id})\n\nAbban az esetben vegye ezt az üzenetet figyelmen kívül, ha BME tagot hívott meg!")
+                embed = embed = disnake.Embed(title=f"Ezt a felhasználót te hívtad meg?", description=f"Felhasználónév: **{interaction.user.name}** ({interaction.user.id})\n\nVedd ezt az üzenetet figyelmen kívül, ha **BME** tagot hívtál meg!", color=disnake.Color.dark_red())
                 
                 inviter = interaction.guild.get_member(self.inviterId)
                 await inviter.send(embed=embed, components=[

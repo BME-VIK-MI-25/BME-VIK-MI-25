@@ -30,14 +30,41 @@ async def IsInterestMessagePresent():
     return True
 
 def BuildVerificationEmbed():
-    embed = disnake.Embed(title="Hitelesítés", description="Ahhoz hogy csatlakozhass a közösségünkhöz, kérlek hitelesítsd fiókod!\n\nAz üzenet alatti gombra kattintva, majd a [NEVED]@edu.bme.hu emailcímedet megadva kezdheted ezt meg. Emailcímet [ezen a linken](https://login.bme.hu/admin/username) tudsz igényelni, ha még esetleg nem tetted..\nA megerősítéshez az (Outlook-os) emailcímedre érkező kódra lesz szükséged.", color=disnake.Color.dark_red())
+    embed = disnake.Embed(
+        title="🔐 Hitelesítés szükséges",
+        description="A szerver teljes eléréséhez előbb hitelesítened kell fiókod!",
+        color=disnake.Color.dark_red()
+    )
+
+    embed.set_thumbnail(url=LOGO_VIK) #VIK logo
+
+    embed.add_field(
+        name="📧 1. Add meg az e-mail címed",
+        value=(
+            "Nyomj rá az üzenet alatti gombra, majd írd be a `[NEVED]@edu.bme.hu` e-mail címed.\n"
+            "Nem tudod pontosan? Nézd meg a [címtárban](https://login.bme.hu/admin/username)!"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="📬 2. Ellenőrizd az e-mailjeidet",
+        value="Erre az email címedre az Outlook-on érzkezik egy kód, amit a következő lépésben kell megadnod.",
+        inline=False
+    )
+
+    embed.set_footer(text="Az adataid biztonságban vannak. A hitelesítés kizárólag jogosultság-ellenőrzés céljából történik.")
     return embed
+
 def BuildInterestEmbed():
-    embed = disnake.Embed(title="Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? Az autók? A játékok? Esetleg a mémek? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
+    embed = disnake.Embed(title="🎯 Érdeklődési kör választása", description="Az általános csevegésen kívül érdekel még más is? 🚗 **Autók**? 🎮 **Játékok**? 🤣 **Mémek**? Itt ezekhez mind találhatsz egy külön csatornát.\n Ahhoz, hogy csatlakozhass, nem kell mást tenned csak az érdeklődésednek megfelelő gombokra kattintani!", color=disnake.Color.dark_red())
+    embed.set_thumbnail(url="https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/hobby_blue.png")
     return embed
 
 def VerificationView():
     return
+
+
 
 global guild_invites
 guild_invites = None
