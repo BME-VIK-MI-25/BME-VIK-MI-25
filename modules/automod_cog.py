@@ -32,7 +32,7 @@ class AutoMod(commands.Cog):
     
     @tasks.loop(seconds=180) # Öt vagy egy perc? Feri: Három
     async def AutoCheckInviteBans(self):
-        for record in automod_definitions.GetBanExpiries():
+        for record in await automod_definitions.GetBanExpiries():
             if record.BanExpiry < datetime.now():
                 userid = record.userId
                 guild = self.bot.get_guild(variables.GUILD_ID)
@@ -42,6 +42,18 @@ class AutoMod(commands.Cog):
                 
                 role = guild.get_role(variables.BME_MEMBER_ROLE_ID) 
                 await member.add_roles(role)
+        
+    @commands.slash_command()
+    @commands.has_permissions(manage_roles=True)
+    async def banword(self, inter: disnake. ApplicationCommandInteraction, word: str):
+        await automod_definitions.InsertBannedWord(word)
+        await inter.response.send_message(f"{word} sikeresen tiltva.", ephemeral=True)
+
+    @commands.slash_command()
+    @commands.has_permissions(manage_roles=True)
+    async def banwords(self, inter: disnake. ApplicationCommandInteraction, words: str=commands.Param(description="Vesszővel(,) válazd el!")):
+        await automod_definitions.InsertBannedWord(words)
+        await inter.response.send_message(f"{words} sikeresen tiltva.", ephemeral=True)
                 
 
 
