@@ -57,7 +57,7 @@ async def RemoveBannedWord(word: str):
     return
 
 async def CheckBannedWord(message: str, userId: int):
-    banned_words = GetBannedWordList()
+    banned_words = await GetBannedWordList()
     for word in banned_words:
         if word in message:
             client = Client()    

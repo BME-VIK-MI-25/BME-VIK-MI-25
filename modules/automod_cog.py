@@ -7,9 +7,12 @@ class AutoMod(commands.Cog):
         self.bot = bot
     
     @commands.Cog.listener()
-    async def on_message(message: disnake.Message):
-        automod_result = automod_definitions.CheckBannedWord(message)
+    async def on_message(self, message: disnake.Message):
+        automod_result = await automod_definitions.CheckBannedWord(message, message.author.id)
         if automod_result == False:
             return
         await message.delete()
-        # Handle banned word count checking, invitee and invite bans
+        # Handle banned word count checking, invitee and invite bans    
+
+def setup(bot):
+    bot.add_cog(AutoMod(bot))
