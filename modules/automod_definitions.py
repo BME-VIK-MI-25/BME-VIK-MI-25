@@ -80,3 +80,9 @@ async def CheckBannedWord(message: str, userId: int):
             await client.disconnect()
             return True
     return False
+
+async def GetBannedWordCount(userId: int):
+    client = Client()    
+    await client.connect()
+    res = client.blacklistedwordcounter.find_first(where = {'userId':userId})
+    return res.count

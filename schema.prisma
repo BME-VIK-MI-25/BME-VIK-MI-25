@@ -29,3 +29,9 @@ model BlacklistedWordCounter {
   userId Int
   count Int
 }
+
+model BannedInviters {
+  id Int @id @default(autoincrement())
+  userId Int
+  BanExpiry DateTime
+}
