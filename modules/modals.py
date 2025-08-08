@@ -19,7 +19,7 @@ class VerificationFirstModal(disnake.ui.Modal):
     def __init__(self):
         components = [
             disnake.ui.TextInput(
-                label="BME Email Cím",
+                label="BME e-mail cím",
                 placeholder="XYZ@edu.bme.hu",
                 custom_id="bme_email",
                 style=TextInputStyle.short,
@@ -31,11 +31,11 @@ class VerificationFirstModal(disnake.ui.Modal):
     async def callback(self, inter: disnake.ModalInteraction):
         bme_email = inter.text_values['bme_email']
         if re.match(".*@edu\.bme\.hu", bme_email) == None:
-            await inter.response.send_message("A megadott email formátum nem megfelelő. Kötelező domain: `edu.bme.hu`", ephemeral=True)
+            await inter.response.send_message("A megadott e-mail formátum nem megfelelő. Kötelező domain: `edu.bme.hu`", ephemeral=True)
             return
         await inter.response.defer(ephemeral=True)
         await SendAuthCode(bme_email)
-        await inter.edit_original_response(f'Megadott email cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az emailjeid között, nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
+        await inter.edit_original_response(f'Megadott e-mail cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az e-mailjeid között, nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_code")
         ])
         return
