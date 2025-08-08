@@ -56,9 +56,27 @@ async def RemoveBannedWord(word: str):
     await client.disconnect()
     return
 
-async def CheckBannedWord(message: str):
+async def CheckBannedWord(message: str, userId: int):
     banned_words = GetBannedWordList()
     for word in banned_words:
         if word in message:
+            client = Client()    
+            await client.connect()   
+            res = client.blacklistedwordcounter.find_first(where = {
+                'userId': userId
+            }) 
+            exists = len(res) == 1
+            if exists:
+                client.blacklistedwordcounter.update(data = {
+                    'count': res.count + 1
+                }, where={
+                    'userId': userId
+                })
+            else:
+                client.blacklistedwordcounter.create(data = {
+                    'userId': userId,
+                    'count': 1
+                })
+            await client.disconnect()
             return True
     return False
