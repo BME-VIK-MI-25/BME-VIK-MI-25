@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 class AutoMod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.AutoCheckInviteBans.start()
     
     @commands.Cog.listener()
     async def on_message(self, message: disnake.Message):
