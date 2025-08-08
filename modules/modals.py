@@ -6,6 +6,8 @@ from email_utils.smtp import SendAuthCode
 import modules.variables as variables
 import re   
 import modules.verify
+import logging
+import modules.logging_config as logging_config
 
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
 BME_MEMBER_ROLE_ID = variables.BME_MEMBER_ROLE_ID
@@ -97,7 +99,9 @@ class VerificationThirdModal(disnake.ui.Modal): # set nickname
         except disnake.Forbidden:
             await interaction.response.send_message(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!", ephemeral=True)
         except disnake.HTTPException as e:
-            await interaction.response.send_message(f"O-ó... Nagy hiba van: {e}", ephemeral=True) 
+            devrole = guild.get_role(DEVELOPER_ROLE_ID)
+            await interaction.response.send_message(f"Hiba történt! Keresd fel a {devrole.mention}", ephemeral=True) 
+            logging.error(f'Nickname change error for: {interaction.user.name}\n{e}')
 
 class GuestConfirmationModal(disnake.ui.Modal):
     def __init__(self, inviterId, inviteeId):
