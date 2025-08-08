@@ -53,12 +53,13 @@ async def InsertInviteData(inviteeId: int, inviterId: int):
 async def GetInviteData(inviteeId: int):
     client = Client()
     await client.connect()
-    await client.invite.find_first(
+    res = await client.invite.find_first(
         where={
             'inviteeid': inviteeId
         }
     )
     await client.disconnect()
+    return res
 
 async def RemoveInviteData(inviteeId: int, inviterId: int):
     client = Client()
