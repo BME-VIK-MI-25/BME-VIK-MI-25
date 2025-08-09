@@ -1,4 +1,4 @@
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 import disnake 
 from disnake import GuildScheduledEventMetadata
 import requests
@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 import datetime
 from bs4 import BeautifulSoup
-from modules.variables import BME_EVENTS_CHANNEL_ID
+from modules.variables import BME_EVENTS_CHANNEL_ID, GENERAL_CHANNEL_ID, GUILD_ID
 
 load_dotenv()
 
@@ -18,16 +18,26 @@ class Event():
         self.start_date = start_date
         self.end_date = end_date
 
-def Embed(name, description, location, start_date, end_date):
-    embed = disnake.Embed(title=name, description=description, color=disnake.Colour.dark_red())
-    embed.add_field("Helyszín", location)
-    embed.add_field("Kezdési dátum", start_date)
-    embed.add_field("Végzési dátum", end_date)
-    return embed
+
+def GetDateFromText(text: str):
+    split = text.split(' - ')
+    time = split[1]
+    hours = int(time.split(':')[0])
+    minutes = int(time.split(':')[1])
+    date = split[0]
+    date_split = date.split('. ')
+    year = int(date_split[0].replace(".", ""))
+    month = int(date_split[1].replace(".", ""))
+    day = int(date_split[2].replace(".", ""))
+
+    date = datetime.datetime(year, month, day, hours, minutes)
+    return date
 
 class EventSync(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
+        self.guild = self.bot.get_guild(GUILD_ID)
+        self.event_checker.start()
 
 #description="Synchronize Discord events with the BME events!"
     @commands.slash_command(description="Synchronize the Discord events with the BME events!")
@@ -74,32 +84,13 @@ class EventSync(commands.Cog):
             start_date_text = start_date_text.replace("\n", "")
             end_date_text = end_date_text.replace("\n", "")
 
-            start_split = start_date_text.split(' - ')
-            start_time = start_split[1]
-            start_hours = int(start_time.split(':')[0])
-            start_minutes = int(start_time.split(':')[1])
-            start_date = start_split[0]
-            start_date_split = start_date.split('. ')
-            start_year = int(start_date_split[0].replace(".", ""))
-            start_month = int(start_date_split[1].replace(".", ""))
-            start_day = int(start_date_split[2].replace(".", ""))
-
-            start_date = datetime.datetime(start_year, start_month, start_day, start_hours, start_minutes)
+            start_date = GetDateFromText(start_date_text)
 
             if start_date_text == end_date_text:
                 end_date = start_date
                 end_date += datetime.timedelta(hours=1)
             else:
-                end_split = end_date_text.split(' - ')
-                end_time = end_split[1]
-                end_hours = int(end_time.split(':')[0])
-                end_minutes = int(end_time.split(':')[1])
-                end_date = end_split[0]
-                end_date_split = end_date.split('. ')
-                end_year = int(end_date_split[0].replace(".", ""))
-                end_month = int(end_date_split[1].replace(".", ""))
-                end_day = int(end_date_split[2].replace(".", ""))
-                end_date = datetime.datetime(end_year, end_month, end_day, end_hours, end_minutes)
+                end_date = GetDateFromText(end_date_text)
 
             title_element = el.find(class_="bme_event_card-title")
             title = title_element.get_text().replace("\t", "").replace("\n", "").strip()
@@ -125,9 +116,31 @@ class EventSync(commands.Cog):
         for event in events:
             if [event.name, event.start_date] in event_names:
                 metadata = GuildScheduledEventMetadata(location=event.location)
-                await inter.guild.create_scheduled_event(name=event.name, entity_type=disnake.GuildScheduledEventEntityType.external, description=event.description, scheduled_end_time=event.end_date, scheduled_start_time=event.start_date, privacy_level=disnake.GuildScheduledEventPrivacyLevel.guild_only, entity_metadata=metadata)
-                await inter.guild.get_channel(BME_EVENTS_CHANNEL_ID).send(embed=Embed(event.name, event.description, event.location, event.start_date, event.end_date))
+                scheduled_event = await inter.guild.create_scheduled_event(name=event.name, entity_type=disnake.GuildScheduledEventEntityType.external, description=event.description, scheduled_end_time=event.end_date, scheduled_start_time=event.start_date, privacy_level=disnake.GuildScheduledEventPrivacyLevel.guild_only, entity_metadata=metadata)
+                await inter.guild.get_channel(BME_EVENTS_CHANNEL_ID).send(f"[{event.name}]({scheduled_event.url})")
         await inter.channel.send("A szinkronizálás befejeződött!")
+    
+    @tasks.loop(minutes=3)
+    async def event_checker(self):
+        events = await self.guild.fetch_scheduled_events()
+        for event in events:
+            description = event.description or ""
+            if "1 NAP VAN HÁTRA!" in description:
+                continue
+            
+            start = event.scheduled_start_time
+            current_datetime = datetime.datetime.now(datetime.timezone.utc)
+            difference = start - current_datetime
+            minutes_left = difference.total_seconds() / 60
+            day_in_minutes = 24 * 60
+
+            if minutes_left < day_in_minutes:
+                event_url = event.url
+                await self.guild.get_channel(GENERAL_CHANNEL_ID).send(
+                    f"A következő [esemény]({event_url})ig kevesebb mint 1 nap van hátra"
+                )
+                new_description = description + "\n1 NAP VAN HÁTRA!"
+                await event.edit(description=new_description)
     
 def setup(bot):
     bot.add_cog(EventSync(bot))
