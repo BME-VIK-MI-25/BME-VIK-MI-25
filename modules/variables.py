@@ -1,21 +1,27 @@
-ENTRY_CHANNEL_ID = 1402717738299818109
+ENTRY_CHANNEL_ID = 1403541404692774997
 ROLES_CHANNEL_ID = 1399074581314146405
 BME_MEMBER_ROLE_ID = 1402754625219723394
 BME_MEMBER_NOINVITE_ROLE_ID = 1403376505693933669
 NOT_BME_MEMBER_ROLE_ID = 1401620272221524089
 GUILD_ID = 1399074580727070761
 BME_EVENTS_CHANNEL_ID = 1403102149243572377
-INTEREST_CHANNEL_ID = 1402717790649057350
+INTEREST_CHANNEL_ID = 1399074581314146405
 DEVELOPER_ROLE_ID = 1402716788482904135
 # Logos and stuff
 LOGO_VIK = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/logo2.png"
 LOGO_HOBBY = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/hobby_blue.png"
-# Roles
+# Roles 
 CUSTOMID_ROLE_PAIRS = {
     "interest_car": 1403049942574039203,
     "interest_game": 1403050052896817222,
     "interest_shitpost": 1403049984332664934,
     "interest_music": 1403049984332664934,
+    "game_ping_role_hevr": 1400594428757934141,
+    "game_ping_role_dbd": 1400593507340652655,
+    "game_ping_role_r6": 1400593112039952485,
+    "game_ping_role_cs2": 1400591080176750653,
+    "game_ping_role_mc": 1400590915709440040,
+    "game_ping_role_valorant": 1400086782871081140
 }
 # Automod vars
-BannedWordCountThreshold = 10
+BannedWordCountThreshold = 20
