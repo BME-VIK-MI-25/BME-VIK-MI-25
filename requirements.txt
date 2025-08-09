@@ -1,8 +1,10 @@
 disnake
 python-dotenv
 prisma-client
+prisma
 pydantic<2
 requests
 beautifulsoup4
 logging
+
 setuptools
