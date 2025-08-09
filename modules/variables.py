@@ -15,13 +15,7 @@ CUSTOMID_ROLE_PAIRS = {
     "interest_car": 1403049942574039203,
     "interest_game": 1403050052896817222,
     "interest_shitpost": 1403049984332664934,
-    "interest_music": 1403049984332664934,
-    "game_ping_role_hevr": 1400594428757934141,
-    "game_ping_role_dbd": 1400593507340652655,
-    "game_ping_role_r6": 1400593112039952485,
-    "game_ping_role_cs2": 1400591080176750653,
-    "game_ping_role_mc": 1400590915709440040,
-    "game_ping_role_valorant": 1400086782871081140
+    "interest_music": 1403049984332664934
 }
 # Automod vars
 BannedWordCountThreshold = 20
