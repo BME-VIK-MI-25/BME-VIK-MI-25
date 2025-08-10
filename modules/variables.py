@@ -8,6 +8,7 @@ BME_EVENTS_CHANNEL_ID = 1403102149243572377
 INTEREST_CHANNEL_ID = 1399074581314146405
 DEVELOPER_ROLE_ID = 1402716788482904135
 GENERAL_CHANNEL_ID = 1399074581314146409
+BME_EMAIL_LOG_CHANNEL_ID = 1403898114301100072
 # Logos and stuff
 LOGO_VIK = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/logo2.png"
 LOGO_HOBBY = "https://raw.githubusercontent.com/BME-VIK-MI-25/public-files/refs/heads/main/hobby_blue.png"

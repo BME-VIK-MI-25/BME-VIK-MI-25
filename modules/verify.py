@@ -45,7 +45,7 @@ async def InsertInviteData(inviteeId: int, inviterId: int):
     await client.invite.create(
         data={
             'inviteeid': inviteeId,
-            'inviterId': inviterId
+            'inviterid': inviterId
         }
     )
     await client.disconnect()

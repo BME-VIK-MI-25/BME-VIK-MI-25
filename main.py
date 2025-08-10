@@ -5,7 +5,7 @@ import os
 import smtplib, ssl
 from email_utils import smtp
 from modules import variables
-from modules.modals import VerificationFirstModal, VerificationSecondModal, VerificationThirdModal, GuestConfirmationModal
+from modules.modals import VerificationFirstModal, VerificationSecondModal
 from modules.verify import InsertInviteData, GetInviteData
 import logging
 import modules.logging_config as logging_config
@@ -114,12 +114,16 @@ async def on_member_join(member: disnake.Member):
 
     if used_invite:
         inviter = used_invite.inviter
-        InsertInviteData(member.id, inviter.id)
+        await InsertInviteData(member.id, inviter.id)
 
 
 @bot.slash_command(description="Multiplies the number by a multiplier")
 async def multiply(inter, number: int, multiplier: int = 7):
     await inter.response.send_message(number * multiplier)
+
+def BuildGuestConfirmEmbed(interaction):
+    embed = disnake.Embed(title=f"Ezt a felhasználót te hívtad meg?", description=f"Felhasználónév: **{interaction.user.name}** ({interaction.user.id})\n\nVedd ezt az üzenetet figyelmen kívül, ha **BME** tagot hívtál meg!", color=disnake.Color.dark_red())
+    return embed
 
 @bot.listen("on_button_click")
 async def verification_listener(interaction: disnake.MessageInteraction):
@@ -132,20 +136,28 @@ async def verification_listener(interaction: disnake.MessageInteraction):
         case "verify_guest":
             inviteeid = interaction.user.id
             invite_data = await GetInviteData(interaction.user.id)
+            if invite_data == None:
+                await interaction.response.send_message("A felhasználó aki meghívott nem szerepel az adatbázisban. Kérjük, kérj segítséget vagy használd BME-s emailed a hitelesítéshez.", ephemeral=True)
             inviterid = invite_data.inviterid
-            await interaction.response.send_modal(GuestConfirmationModal(inviterid, inviteeid))
+            embed = BuildGuestConfirmEmbed(interaction)
+                
+            inviter = interaction.guild.get_member(inviterid)
+            await inviter.send(embed=embed, components=[
+                disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
+                disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
+            ])
+
+            await interaction.response.send_message("Sikeres választás! Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!", ephemeral=True)
 
         case "verify_code":
             bme_email = interaction.message.content.split('`')[1]
             await interaction.response.send_modal(VerificationSecondModal(bme_email))
 
-        case "start_nickname_modal":
-            await interaction.response.send_modal(VerificationThirdModal())
-
         case "guest_verify":
             userid = int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
             invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
-            await invitee.add_roles(variables.NOT_BME_MEMBER_ROLE_ID)
+            guestrole = bot.get_guild(variables.GUILD_ID).get_role(variables.NOT_BME_MEMBER_ROLE_ID)
+            await invitee.add_roles(guestrole)
             await interaction.response.send_message("Sikeresen megerősítve!")
             await invitee.send("A meghívó fél sikeresen megerősített!")
 

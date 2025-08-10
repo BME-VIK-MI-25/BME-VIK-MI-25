@@ -46,6 +46,12 @@ def WelcomeEmbed(guildName):
     embed = disnake.Embed(title=f"Üdvözlünk a {guildName} szerveren!", description=f"Ne felejtsd el meglátogatni a <#{ROLES_CHANNEL_ID}> csatornát, hogy a rolejaidat átvedd!", color=disnake.Color.dark_red())
     return embed
 
+def BuildBmeEmailEmbed(bme_email: str, mention):
+    embed = disnake.Embed(title="EMAIL LOG")
+    embed.add_field(name="Felhasználó(említve)", value=f"{mention}")
+    embed.add_field(name="Email cím", value=f"{bme_email}")
+    return embed
+
 class VerificationSecondModal(disnake.ui.Modal):
     def __init__(self, bme_email):
         self.bme_email = bme_email
@@ -56,81 +62,44 @@ class VerificationSecondModal(disnake.ui.Modal):
                 custom_id="auth_code",
                 style=TextInputStyle.short,
                 max_length=10
-            )
-        ]
-        super().__init__(title="Hitelesítés", components=components)
-
-    async def callback(self, inter: disnake.ModalInteraction):
-        auth_code = inter.text_values['auth_code']
-        print(auth_code)
-        try:
-            correct_code = await CheckAuthCode(auth_code)
-        except:
-            await inter.response.send_message("A megadott hitelesítési kód hibás, vagy hiányos!", ephemeral=True)
-        if correct_code:
-            await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
-            bme_role = inter.guild.get_role(BME_MEMBER_ROLE_ID)
-            await inter.user.add_roles(bme_role)
-            await inter.response.send_message("Sikeres hitelesítés! Kérlek add meg a beceneved", components=[
-            disnake.ui.Button(label="Becenév megadása", style=disnake.ButtonStyle.success, custom_id="start_nickname_modal")], ephemeral=True)
-        else:
-            await inter.response.send_message("A megadott hitelesítő kód rossz.", ephemeral=True)
-        return
-    
-class VerificationThirdModal(disnake.ui.Modal): # set nickname
-    def __init__(self):
-        components = [
+            ),
             disnake.ui.TextInput(
-                label="Becenév megadása",
-                placeholder="Becenév",
+                label="Teljes név megadása",
+                placeholder="Vicc Elek",
                 custom_id="nickname",
                 style=disnake.TextInputStyle.short,
                 max_length=32,
             )
         ]
-        super().__init__(title="Becenév beállítása", components=components, custom_id="nickname_modal")
-        
-    async def callback(self, interaction: disnake.ModalInteraction):
-        new_nick = interaction.text_values["nickname"]
+        super().__init__(title="Hitelesítés", components=components)
+
+    async def callback(self, inter: disnake.ModalInteraction):
+        await inter.response.defer(ephemeral=True)
+        # Hitelesítő kód
+        auth_code = inter.text_values['auth_code']
+        print(auth_code)
         try:
-            await interaction.author.edit(nick=new_nick)
-            await interaction.response.send_message(f"A becenevedet a szerveren az általad megadott névre módosítottuk. Érezd jól magad a továbbiakban is **{new_nick}**!", ephemeral=True)
-            await modules.verify.RemoveInviteDataOnSuccessfulAuth(interaction.user.id)
-        except disnake.Forbidden:
-            await interaction.response.send_message(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!", ephemeral=True)
-        except disnake.HTTPException as e:
-            await interaction.response.send_message(f"Hiba történt! Keresd fel a fejlesztőket!", ephemeral=True) 
-            logging.error(f'Nickname change error for: {interaction.user.name}\n{e}')
+            correct_code = await CheckAuthCode(auth_code)
+        except:
+            await inter.edit_original_response("A megadott hitelesítési kód hibás, vagy hiányos!")
+        if correct_code:
+            await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
+            bme_role = inter.guild.get_role(BME_MEMBER_ROLE_ID)
+            await inter.user.add_roles(bme_role)
+            self.bme_email = self.bme_email.replace('\\', '')
+            await inter.guild.get_channel(variables.BME_EMAIL_LOG_CHANNEL_ID).send(embed = BuildBmeEmailEmbed(self.bme_email, inter.user.mention))
 
-class GuestConfirmationModal(disnake.ui.Modal):
-    def __init__(self, inviterId, inviteeId):
-        self.inviterId = inviterId
-        self.inviteeId = inviteeId
-        
-        components = [
-            disnake.ui.TextInput(
-                label="Megerősítés",
-                placeholder="'IGEN' vagy 'NEM'",
-                custom_id="confirmation",
-                style=TextInputStyle.short,
-                max_length=4
-            )
-        ]
-        super().__init__(title="Megerősítés", components=components)
-
-    async def callback(self, interaction: disnake.ModalInteraction):
-        confirmation_value = interaction.text_values['confirmation'].upper()
-
-        match confirmation_value:
-            case 'IGEN':
-                embed = BuildGuestConfirmEmbed(interaction)
-                
-                inviter = interaction.guild.get_member(self.inviterId)
-                await inviter.send(embed=embed, components=[
-                    disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
-                    disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
-                ])
-
-                await interaction.response.send_message("Sikeres választás! Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!", ephemeral=True)
-            case 'NEM':
-                await interaction.response.send_message("Sikeres választás!", ephemeral=True)
+            # Teljes név
+            new_nick = inter.text_values["nickname"]
+            try:
+                await inter.author.edit(nick=new_nick)
+                await inter.edit_original_response(f"A beceneved a szerveren az általad megadott névre módosítottuk. Érezd jól magad a továbbiakban is **{new_nick}**!")
+                await modules.verify.RemoveInviteDataOnSuccessfulAuth(inter.user.id)
+            except disnake.Forbidden:
+                await inter.edit_original_response(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!")
+            except disnake.HTTPException as e:
+                await inter.edit_original_response(f"Hiba történt! Keresd fel a fejlesztőket!") 
+                logging.error(f'Nickname change error for: {inter.user.name}\n{e}')
+            else:
+                await inter.edit_original_response("A megadott hitelesítő kód rossz.")
+        return
