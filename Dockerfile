@@ -16,10 +16,7 @@ WORKDIR /app
 
 # Copy and install dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt 
-
-COPY schema.prisma ./schema.prisma
-RUN prisma generate
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of your app
 COPY . .
