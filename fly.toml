@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for bme-vik-mi-25 on 2025-08-06T19:42:06Z
+# fly.toml app configuration file generated for bme-vik-mi-25-u9yehw on 2025-08-10T01:17:11Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'bme-vik-mi-25'
+app = 'bme-vik-mi-25-u9yehw'
 primary_region = 'fra'
 
 [build]
@@ -13,7 +13,7 @@ primary_region = 'fra'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ['app']
 
 [[vm]]
