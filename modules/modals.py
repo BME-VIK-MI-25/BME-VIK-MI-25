@@ -1,13 +1,10 @@
 import disnake
-from disnake.ext import commands
 from disnake import TextInputStyle
 from modules.verify import CheckAuthCode
 from email_utils.smtp import SendAuthCode
 import modules.variables as variables
-import re   
-import modules.verify
-import logging
-import modules.logging_config as logging_config
+import re
+from modules.log import log_message
 
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
 BME_MEMBER_ROLE_ID = variables.BME_MEMBER_ROLE_ID
@@ -102,7 +99,7 @@ class VerificationSecondModal(disnake.ui.Modal):
                 await inter.edit_original_response(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!")
             except disnake.HTTPException as e:
                 await inter.edit_original_response(f"Hiba történt! Keresd fel a fejlesztőket!") 
-                logging.error(f'Nickname change error for: {inter.user.name}\n{e}')
+                await log_message(inter.bot,"error",f'Nickname change error for: {inter.user.name}\n{e}')
         else:
             await inter.edit_original_response("A megadott hitelesítő kód rossz.")
         return
