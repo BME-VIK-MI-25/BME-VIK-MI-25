@@ -83,7 +83,10 @@ class VerificationSecondModal(disnake.ui.Modal):
         except:
             await inter.edit_original_response("A megadott hitelesítési kód hibás, vagy hiányos!")
         if correct_code:
-            await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
+            try:
+                await inter.user.send(embed=WelcomeEmbed("BME VIK Mérnökinformatika 2025 -"))
+            except disnake.errors.Forbidden: # Stub for no error message in log
+                a = 0
             bme_role = inter.guild.get_role(BME_MEMBER_ROLE_ID)
             await inter.user.add_roles(bme_role)
             self.bme_email = self.bme_email.replace('\\', '')
