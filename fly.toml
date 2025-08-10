@@ -16,6 +16,8 @@ primary_region = 'fra'
   min_machines_running = 0
   processes = ['app']
 
+console_command = "prisma db push"
+
 
 [[vm]]
   cpu_kind = 'shared'
