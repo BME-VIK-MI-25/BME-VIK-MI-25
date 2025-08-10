@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'bme-vik-mi-25-u9yehw'
+app = 'bme-vik-mi-25'
 primary_region = 'fra'
 
 [build]
