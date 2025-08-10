@@ -17,7 +17,7 @@ primary_region = 'fra'
   processes = ['app']
 
 [processes]
-  app = "python3 main.py"  # or python bot.py, your bot start command
+  app = "python3 main.py"
 
 [[vm]]
   cpu_kind = 'shared'
