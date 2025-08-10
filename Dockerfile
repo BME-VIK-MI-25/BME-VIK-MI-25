@@ -1,22 +1,33 @@
 # Use an official Python runtime as a parent image
 FROM python:3.13-slim
 
+# Install system dependencies first
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libffi-dev \
+    curl \
+    openssl \
+    pkg-config \
+ && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Copy requirements first (for caching)
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy Prisma schema and generate client
 COPY schema.prisma ./schema.prisma
-RUN prisma generate
+RUN npx prisma generate
 
-# Copy the rest of the application code into the container
+# Copy the rest of the application code
 COPY . .
 
-# Command to run the application (assuming your main script is main.py)
-
+# Run the app
 CMD ["python", "main.py"]
-
