@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Prisma schema and generate client
 COPY schema.prisma ./schema.prisma
-RUN npx prisma generate
+RUN prisma generate
 
 # Copy the rest of the application code
 COPY . .
