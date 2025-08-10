@@ -2,13 +2,10 @@ import disnake
 from disnake.ext import commands
 from dotenv import load_dotenv
 import os
-import smtplib, ssl
-from email_utils import smtp
 from modules import variables
 from modules.modals import VerificationFirstModal, VerificationSecondModal
 from modules.verify import InsertInviteData, GetInviteData
-import logging
-import modules.logging_config as logging_config
+from modules.log import log_message
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
@@ -74,7 +71,7 @@ guild_invites = None
 @bot.event
 async def on_ready():
     global guild_invites
-    logging.info('Starting up...')
+    await log_message(bot, "info","Bot starting up...")
     for filename in os.listdir("./modules"):
         if filename.endswith(".py") and filename.__contains__("cog"):
             bot.load_extension(f"modules.{filename[:-3]}")
