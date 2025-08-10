@@ -1,5 +1,5 @@
 # Use Python 3.11 slim image
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 # Install system dependencies for building Python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -24,3 +24,4 @@ COPY . .
 
 # Run the application
 CMD ["python", "main.py"]
+
