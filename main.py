@@ -138,6 +138,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
             invite_data = await GetInviteData(interaction.user.id)
             if invite_data == None:
                 await interaction.response.send_message("A felhasználó aki meghívott nem szerepel az adatbázisban. Kérjük, kérj segítséget vagy használd BME-s emailed a hitelesítéshez.", ephemeral=True)
+                return
             inviterid = invite_data.inviterid
             embed = BuildGuestConfirmEmbed(interaction)
                 

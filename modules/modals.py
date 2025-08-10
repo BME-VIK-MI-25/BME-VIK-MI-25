@@ -92,14 +92,14 @@ class VerificationSecondModal(disnake.ui.Modal):
             # Teljes név
             new_nick = inter.text_values["nickname"]
             try:
-                await inter.author.edit(nick=new_nick)
+                await inter.user.edit(nick=new_nick)
                 await inter.edit_original_response(f"A beceneved a szerveren az általad megadott névre módosítottuk. Érezd jól magad a továbbiakban is **{new_nick}**!")
-                await modules.verify.RemoveInviteDataOnSuccessfulAuth(inter.user.id)
+
             except disnake.Forbidden:
                 await inter.edit_original_response(f"Sajnos nincs jogosultságom megváltoztatni a nevedet. Valami balul sült el, kérlek jelezd a fejlesztőknek!")
             except disnake.HTTPException as e:
                 await inter.edit_original_response(f"Hiba történt! Keresd fel a fejlesztőket!") 
                 logging.error(f'Nickname change error for: {inter.user.name}\n{e}')
-            else:
-                await inter.edit_original_response("A megadott hitelesítő kód rossz.")
+        else:
+            await inter.edit_original_response("A megadott hitelesítő kód rossz.")
         return
