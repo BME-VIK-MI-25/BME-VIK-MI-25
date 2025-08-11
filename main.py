@@ -178,5 +178,4 @@ async def verification_listener(interaction: disnake.MessageInteraction):
                     await user.remove_roles(role)
                     await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
 
-
 bot.run(BOT_TOKEN)
