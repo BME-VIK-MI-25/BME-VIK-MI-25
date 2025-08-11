@@ -75,7 +75,7 @@ async def on_ready():
     for filename in os.listdir("./modules"):
         if filename.endswith(".py") and filename.__contains__("cog"):
             bot.load_extension(f"modules.{filename[:-3]}")
-"""
+
     is_vm_present = await IsVerificationMessagePresent()
     is_it_present = await IsInterestMessagePresent()
     if is_vm_present == False:
@@ -177,6 +177,5 @@ async def verification_listener(interaction: disnake.MessageInteraction):
                 else:
                     await user.remove_roles(role)
                     await interaction.response.send_message("Elvettük az elvenni kívánt rangot.", ephemeral=True)
-"""
 
 bot.run(BOT_TOKEN)
