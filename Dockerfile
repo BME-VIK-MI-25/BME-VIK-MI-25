@@ -20,8 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY schema.prisma ./schema.prisma
 RUN pip install --no-cache-dir "prisma==0.12.*" -r requirements.txt
 
-RUN chmod +x ./auto-commit.sh  \
-     && ./auto-commit.sh
+RUN chmod +x auto-commit.sh  \
+     && auto-commit.sh
 
 # debug the intended platform/commit
 RUN python - <<'PY'
