@@ -1,11 +1,41 @@
-#!/bin/bash
-WATCH_DIR=/app   # Path inside the container
-GIT_REPO=https://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@github.com/username/repo.git
+#!/usr/bin/env bash
+set -euo pipefail
 
-cd $WATCH_DIR || exit 1
+: "${WATCH_DIR:=/app}"
+: "${GIT_BRANCH:=main}"
 
-while inotifywait -r -e modify,create,delete,move .; do
-    git add .
-    git commit -m "Auto commit $(date '+%Y-%m-%d %H:%M:%S')"
-    git push $GIT_REPO main
+cd "$WATCH_DIR"
+
+# Expect GIT_REPO like: github.com/USERNAME/REPO.git (no scheme)
+REMOTE_URL="https://${GH_TOKEN}@${GIT_REPO}"
+
+# Ensure repo exists + remote configured
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "auto-commit: initializing git repo in $WATCH_DIR"
+  git init
+  git checkout -B "$GIT_BRANCH"
+  git remote add origin "$REMOTE_URL"
+else
+  if git remote get-url origin >/dev/null 2>&1; then
+    git remote set-url origin "$REMOTE_URL"
+  else
+    git remote add origin "$REMOTE_URL"
+  fi
+fi
+
+# Optional first push
+git add -A || true
+if ! git diff --cached --quiet; then
+  git commit -m "Initial auto-commit $(date '+%F %T')" || true
+  git push -u origin "$GIT_BRANCH" || true
+fi
+
+echo "auto-commit: watching $WATCH_DIR on branch $GIT_BRANCH ..."
+while inotifywait -r -e modify,create,delete,move "$WATCH_DIR"; do
+  git add -A || true
+  if git diff --cached --quiet; then
+    continue
+  fi
+  git commit -m "Auto commit $(date '+%F %T')" || true
+  git push origin "$GIT_BRANCH" || true
 done
