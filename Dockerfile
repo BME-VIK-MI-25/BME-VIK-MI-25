@@ -21,11 +21,7 @@ COPY schema.prisma ./schema.prisma
 RUN pip install --no-cache-dir "prisma==0.12.*"
 
 # --- prisma debug (unchanged) ---
-RUN python - <<'PY'
-from prisma.binaries import platform, BINARY_VERSION
-print("Platform:", platform())
-print("Engine commit:", BINARY_VERSION)
-PY
+RUN prisma --version || true
 
 COPY schema.prisma .
 ENV PRISMA_PY_BINARY_TARGETS=debian-openssl-3.0.x
@@ -40,5 +36,8 @@ RUN chmod +x /app/auto-commit.sh /app/entrypoint.sh
 ENV WATCH_DIR=/app
 ENV GIT_BRANCH=main
 
+COPY . .
+
 # Start via entrypoint (spawns watcher + your app)
 ENTRYPOINT ["/app/entrypoint.sh"]
+
