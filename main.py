@@ -6,6 +6,7 @@ from modules import variables
 from modules.modals import VerificationFirstModal, VerificationSecondModal
 from modules.verify import InsertInviteData, GetInviteData
 from modules.log import log_message
+from data.db import InviteDict
 
 intents = disnake.Intents.all()
 bot = commands.InteractionBot(intents=intents, test_guilds=[1399074580727070761])
@@ -111,7 +112,7 @@ async def on_member_join(member: disnake.Member):
 
     if used_invite:
         inviter = used_invite.inviter
-        await InsertInviteData(member.id, inviter.id)
+        await InsertInviteData(inviteeId=member.id, inviterId=inviter.id, inviteDict=InviteDict)
 
 
 @bot.slash_command(description="Multiplies the number by a multiplier")
@@ -132,7 +133,7 @@ async def verification_listener(interaction: disnake.MessageInteraction):
 
         case "verify_guest":
             inviteeid = interaction.user.id
-            invite_data = await GetInviteData(interaction.user.id)
+            invite_data = await GetInviteData(inviteeId=interaction.user.id, inviteDict=InviteDict)
             if invite_data == None:
                 await interaction.response.send_message("A felhasználó aki meghívott nem szerepel az adatbázisban. Kérjük, kérj segítséget vagy használd BME-s emailed a hitelesítéshez.", ephemeral=True)
                 return

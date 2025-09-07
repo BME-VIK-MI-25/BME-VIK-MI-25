@@ -3,6 +3,7 @@ import smtplib, ssl
 from dotenv import load_dotenv
 from email.message import EmailMessage
 import os
+from data.db import moderationDict as authDict
 
 load_dotenv()
 
@@ -12,7 +13,7 @@ EMAIL = "bme@kadarmarcell.hu"
 SMTP_PW = os.getenv("SMTP_PASSWORD")
 
 async def SendAuthCode(to_email: str):
-    auth_code = await CreateAuthCode(to_email)
+    auth_code = await CreateAuthCode(email=to_email, authDict=authDict)
     with smtplib.SMTP_SSL("mail.nethely.hu", port, context=context) as email_server:
         email_server.login(EMAIL, SMTP_PW)
         message = EmailMessage()

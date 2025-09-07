@@ -1,83 +1,30 @@
-from prisma import Client
 import random
-async def CreateAuthCode(email: str):
-    client = Client()
-    await client.connect()
-    authCode = random.randint(1000000000, 9999999999)
-    await client.auth.create(
-        data = {
-            'email': email,
-            'authcode': authCode
-        }
-    )
-    await client.disconnect()
-    return authCode
 
-async def CheckAuthCode(authCode: str):
-    client = Client()
-    await client.connect()
+async def CreateAuthCode(email: str, authDict: dict) -> None:
+    authCode = random.randint(1000000000, 9999999999)
+    authDict.update({email: authCode})
+
+async def CheckAuthCode(authCode: str, authDict: dict) -> bool:
     authCode = int(authCode)
-    result = await client.auth.find_first(
-        where={
-            'authcode': authCode
-        }
-    )
-    if result == None:
+
+    if authCode not in authDict.values():
         return False
     else:
-        await RemoveAuthCode(authCode)
-        return True
+        for key, value in authDict.items():
+            if value == authCode:
+                authDict.pop(key)
+                return True
 
-async def RemoveAuthCode(authCode: str):
-    client = Client()
-    authCode = int(authCode)
-    await client.connect()
-    await client.auth.delete(
-        where={
-            'authcode': authCode
-        }
-    )
-    await client.disconnect()
+async def InsertInviteData(inviteeId: int, inviterId: int, inviteDict: dict) -> None:
+    inviteDict.update({inviteeId: inviterId})
+    
+async def GetInviteData(inviteeId: int, inviteDict: dict) -> int | None:
+    
+    InviterID = inviteDict.get(inviteeId)
+    if InviterID is None:
+        return None
+    else:
+        return InviterID
 
-async def InsertInviteData(inviteeId: int, inviterId: int):
-    client = Client()
-    await client.connect()
-    await client.invite.create(
-        data={
-            'inviteeid': inviteeId,
-            'inviterid': inviterId
-        }
-    )
-    await client.disconnect()
-
-async def GetInviteData(inviteeId: int):
-    client = Client()
-    await client.connect()
-    res = await client.invite.find_first(
-        where={
-            'inviteeid': inviteeId
-        }
-    )
-    await client.disconnect()
-    return res
-
-async def RemoveInviteData(inviteeId: int, inviterId: int):
-    client = Client()
-    await client.connect()
-    await client.invite.delete(
-        where={
-            'inviteeid': inviteeId,
-            'inviterId': inviterId
-        }
-    )
-    await client.disconnect()
-
-async def RemoveInviteDataOnSuccessfulAuth(inviteeId: int):
-    client = Client()
-    await client.connect()
-    await client.invite.delete(
-        where={
-            'inviteeid': inviteeId
-        }
-    )
-    await client.disconnect()
+async def RemoveInviteData(inviteeId: int, inviteDict: dict) -> None:
+    inviteDict.pop(inviteeId, None)

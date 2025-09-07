@@ -1,111 +1,59 @@
-from prisma import Client
-import prisma 
-async def InsertBannedWords(words: list[str]):
-    try:
-        client = Client()    
-        await client.connect()    
-        for el in words:
-            await client.blacklistedwords.create(
-                data = {
-                    'word': el
-                }
-            )
-        await client.disconnect()
-        return True
-    except prisma.errors.DataError:
-        await client.disconnect()
-        return "Hibás adatok, a beszúrás nem történt meg."
-    except prisma.errors.ClientNotConnectedError:
-        await client.disconnect()
-        return "Kapcsolódási hiba, a beszúrás nem történt meg."
+from data.db import banned_words
+from data.db import moderationDict
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+banned_words_file = BASE_DIR / "data" / "banned_words.txt"
+
+async def InsertBannedWords(words: list[str]) -> None:
+    word_list = words.split(',')
+    for word in word_list:
+        word = word.strip()
+        if word not in banned_words:
+            with open(banned_words_file, 'a') as f:
+                f.write(f"{word}\n")
+            banned_words.append(word)
     
-async def InsertBannedWord(word: str):
-    try:
-        client = Client()    
-        await client.connect()    
-        await client.blacklistedwords.create(
-            data = {
-                'word': word
-            }
-        )
-        await client.disconnect()
-        return True
-    except prisma.errors.DataError:
-        await client.disconnect()
-        return "Hibás adatok, a beszúrás nem történt meg."
-    except prisma.errors.ClientNotConnectedError:
-        await client.disconnect()
-        return "Kapcsolódási hiba, a beszúrás nem történt meg."
+async def InsertBannedWord(word: str) -> None:
+    if word not in banned_words:
+        with open(banned_words_file, 'a') as f:
+            f.write(f"{word}\n")
+        banned_words.append(word)
 
-async def GetBannedWordList():
-    client = Client()    
-    await client.connect()    
-    result = await client.blacklistedwords.find_many()
-    words = [res.word for res in result]
-    await client.disconnect()
-    return words
 
-async def RemoveBannedWord(word: str):
-    client = Client()    
-    await client.connect()    
-    await client.blacklistedwords.delete(
-        where = {
-            'word': word
-        }
-    )
-    await client.disconnect()
-    return
+async def GetBannedWordList() -> list[str]:
+    return banned_words
 
-async def CheckBannedWord(message: str, userId: int):
-    banned_words = await GetBannedWordList()
+async def RemoveBannedWord(word: str) -> None:
+    if word in banned_words:
+        banned_words.remove(word)
+        with open(banned_words_file, 'w') as f:
+            for line in banned_words:
+                    f.write(f"{line}\n")
+
+async def CheckBannedWord(message: str, userId: int) -> bool:
     for word in banned_words:
         if word in message.content:
-            client = Client()    
-            await client.connect()   
-            res = await client.blacklistedwordcounter.find_first(where = {
-                'userId': userId
-            }) 
-            exists = res != None
-            if exists:
-                await client.blacklistedwordcounter.update(data = {
-                    'count': res.count + 1
-                }, where={
-                    'userId': userId
-                })
+            if moderationDict.get(userId) is not None:
+                moderationDict[userId]['bannedCount'] += 1
             else:
-                await client.blacklistedwordcounter.create(data = {
-                    'userId': userId,
-                    'count': 1
-                })
-            await client.disconnect()
+                moderationDict[userId] = {'bannedCount': 1, 'inviteBanExpiry': None}
             return True
     return False
 
-async def GetBannedWordCount(userId: int):
-    client = Client()    
-    await client.connect()
-    res = await client.blacklistedwordcounter.find_first(where = {'userId':userId})
-    return res.count
+async def GetBannedWordCount(userId: int) -> int:
+    if moderationDict.get(userId) is not None:
+        return moderationDict[userId]['bannedCount']
+    return 0
 
-async def UpdateBanExpiry(user_id: int, ban_expiry):
-    client = Client()
-    await client.connect()
-    data = {
-        'userId': user_id,
-        'BanExpiry': ban_expiry
-    }
-    await client.bannedinviters.create(data)
-    await client.disconnect()
+async def UpdateBanExpiry(user_id: int, ban_expiry) -> None:
+    moderationDict[user_id]['inviteBanExpiry'] = ban_expiry
 
-async def GetBanExpiries():
-    client = Client()
-    await client.connect()
-    res = await client.bannedinviters.find_many()
-    await client.disconnect()
-    return res
+async def GetBanExpiries() -> list[dict]:
+    records_list = [{"userId": userId, **info} for userId, info in moderationDict.items()]
+    return records_list
 
-async def DeleteBanExpiry(user_id: int):
-    client = Client()
-    await client.connect()
-    await client.bannedinviters.delete(where={'userId' : user_id})
-    await client.disconnect
+async def DeleteBanExpiry(user_id: int) -> None:
+    if moderationDict.get(user_id) is not None:
+        moderationDict[user_id]['inviteBanExpiry'] = None
+        moderationDict[user_id]['bannedCount'] = 0

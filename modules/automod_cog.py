@@ -15,7 +15,12 @@ class AutoMod(commands.Cog):
         automod_result = await automod_definitions.CheckBannedWord(message, message.author.id)
         if automod_result == False:
             return
-        await message.delete()
+        try:
+            await message.delete()
+        except disnake.NotFound:
+            print("Az üzenetet már törölték.")
+        except disnake.Forbidden:
+            print("Nincs jogosultságom törölni az üzenetet.")
 
         BannedWordCount = await automod_definitions.GetBannedWordCount(message.author.id)
         if BannedWordCount >= variables.BannedWordCountThreshold:
@@ -34,7 +39,7 @@ class AutoMod(commands.Cog):
     async def AutoCheckInviteBans(self):
         records = await automod_definitions.GetBanExpiries()
         for record in records:
-            if record.BanExpiry < datetime.now(timezone.utc): #timezone aware
+            if record.inviteBanExpiry < datetime.now(timezone.utc): #timezone aware
 
                 userid = record.userId
                 
@@ -50,14 +55,14 @@ class AutoMod(commands.Cog):
         
     @commands.slash_command()
     @commands.has_permissions(manage_roles=True)
-    async def banword(self, inter: disnake. ApplicationCommandInteraction, word: str):
+    async def banword(self, inter: disnake.ApplicationCommandInteraction, word: str):
         await automod_definitions.InsertBannedWord(word)
         await inter.response.send_message(f"{word} sikeresen tiltva.", ephemeral=True)
 
     @commands.slash_command()
     @commands.has_permissions(manage_roles=True)
-    async def banwords(self, inter: disnake. ApplicationCommandInteraction, words: str=commands.Param(description="Vesszővel(,) válazd el!")):
-        await automod_definitions.InsertBannedWord(words)
+    async def banwords(self, inter: disnake.ApplicationCommandInteraction, words: str=commands.Param(description="Vesszővel(,) válazd el!")):
+        await automod_definitions.InsertBannedWords(words)
         await inter.response.send_message(f"{words} sikeresen tiltva.", ephemeral=True)
 
 

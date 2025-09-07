@@ -5,6 +5,7 @@ from email_utils.smtp import SendAuthCode
 import modules.variables as variables
 import re
 from modules.log import log_message
+from data.db import VerificationDict as authDict
 
 ROLES_CHANNEL_ID = variables.ROLES_CHANNEL_ID
 BME_MEMBER_ROLE_ID = variables.BME_MEMBER_ROLE_ID
@@ -29,12 +30,12 @@ class VerificationFirstModal(disnake.ui.Modal):
 
     async def callback(self, inter: disnake.ModalInteraction):
         bme_email = inter.text_values['bme_email']
-        if re.match(".*@edu\.bme\.hu", bme_email) == None:
+        if re.match(r".*@edu\.bme\.hu", bme_email) == None:
             await inter.response.send_message("A megadott e-mail formátum nem megfelelő. Kötelező domain: `edu.bme.hu`", ephemeral=True)
             return
         await inter.response.defer(ephemeral=True)
         await SendAuthCode(bme_email)
-        await inter.edit_original_response(f'Megadott e-mail cím:\`**{bme_email}**\`(Ha a kód nem jelenik meg az e-mailjeid között, nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
+        await inter.edit_original_response(f'Megadott e-mail cím:`**{bme_email}**`(Ha a kód nem jelenik meg az e-mailjeid között, nézd meg a spam-ek között, mielőtt segítséghez fordulsz!)\nKatt ide, hogy folytasd!', components=[
             disnake.ui.Button(label="Hitelesítés", style=disnake.ButtonStyle.success, custom_id="verify_code")
         ])
         return
@@ -76,7 +77,7 @@ class VerificationSecondModal(disnake.ui.Modal):
         auth_code = inter.text_values['auth_code']
         print(auth_code)
         try:
-            correct_code = await CheckAuthCode(auth_code)
+            correct_code = await CheckAuthCode(authCode=auth_code, authDict=authDict)
         except:
             await inter.edit_original_response("A megadott hitelesítési kód hibás, vagy hiányos!")
         if correct_code:
