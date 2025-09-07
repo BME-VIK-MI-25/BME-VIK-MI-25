@@ -18,7 +18,7 @@ class AutoMod(commands.Cog):
         try:
             await message.delete()
         except disnake.NotFound:
-            print("Az üzenetet már törölték.")
+            print("Az üzenet nem létezik.") # nem tudom miért de ez lefut mindig amikor használjuk azt a parancsot amivel hozzáadunk szavakat ezért a try block xd
         except disnake.Forbidden:
             print("Nincs jogosultságom törölni az üzenetet.")
 
