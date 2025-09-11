@@ -109,7 +109,6 @@ async def on_member_join(member: disnake.Member):
                     break
     
     guild_invites = invites_after
-
     if used_invite:
         inviter = used_invite.inviter
         await InsertInviteData(inviteeId=member.id, inviterId=inviter.id, inviteDict=InviteDict)
@@ -130,13 +129,17 @@ async def verification_listener(interaction: disnake.MessageInteraction):
     match CUSTOM_ID:
         case "verify_email":
             await interaction.response.send_modal(VerificationFirstModal())
-
+        
         case "verify_guest":
             inviteeid = interaction.user.id
             invite_data = await GetInviteData(inviteeId=interaction.user.id, inviteDict=InviteDict)
             if invite_data == None:
+                """
                 await interaction.response.send_message("A felhasználó aki meghívott nem szerepel az adatbázisban. Kérjük, kérj segítséget vagy használd BME-s emailed a hitelesítéshez.", ephemeral=True)
                 return
+                """
+                
+            """
             inviterid = invite_data.inviterid
             embed = BuildGuestConfirmEmbed(interaction)
                 
@@ -145,9 +148,15 @@ async def verification_listener(interaction: disnake.MessageInteraction):
                 disnake.ui.Button(label="Megerősítés", style=disnake.ButtonStyle.success, custom_id="guest_verify"),
                 disnake.ui.Button(label="Elutasítás", style=disnake.ButtonStyle.success, custom_id="guest_deny")
             ])
-
-            await interaction.response.send_message("Sikeres választás! Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!", ephemeral=True)
-
+            """
+            await interaction.response.send_message("Sikeres választás! ~~Aki meghívott, kapott egy megerősítő üzenetet, amint megerősítenek, megkapod a szerverhez való hozzáférést!~~", ephemeral=True)
+            userid = interaction.user.id #int(interaction.message.embeds[0].description.split("(")[1].split(')')[0])
+            invitee = bot.get_guild(variables.GUILD_ID).get_member(userid)
+            guestrole = bot.get_guild(variables.GUILD_ID).get_role(variables.NOT_BME_MEMBER_ROLE_ID)
+            await invitee.add_roles(guestrole)
+            await interaction.response.send_message("Sikeresen megerősítve!")
+            await invitee.send("A meghívó fél sikeresen megerősített!")
+            
         case "verify_code":
             bme_email = interaction.message.content.split('`')[1]
             await interaction.response.send_modal(VerificationSecondModal(bme_email))

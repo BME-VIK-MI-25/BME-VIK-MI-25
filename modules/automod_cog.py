@@ -4,6 +4,7 @@ import modules.automod_definitions as automod_definitions
 import modules.variables as variables
 import modules.verify as verify
 from datetime import datetime, timedelta, timezone
+from data.db import banned_words
 
 class AutoMod(commands.Cog):
     def __init__(self, bot):
@@ -39,7 +40,9 @@ class AutoMod(commands.Cog):
     async def AutoCheckInviteBans(self):
         records = await automod_definitions.GetBanExpiries()
         for record in records:
-            if record.inviteBanExpiry < datetime.now(timezone.utc): #timezone aware
+            print(record)
+            if record[1] < datetime.now(timezone.utc): #timezone aware
+            
 
                 userid = record.userId
                 
@@ -84,13 +87,12 @@ class AutoMod(commands.Cog):
     @commands.slash_command(description="List banned words")
     @commands.has_permissions(manage_roles=True)
     async def listwords(self, inter: disnake.ApplicationCommandInteraction):
-        words = await automod_definitions.GetBannedWordList()
         embed = disnake.Embed(
-            title=f'Bannolt szavak({len(words)}):',
+            title=f'Bannolt szavak({len(banned_words)}):',
             description="",
             color=disnake.Color.blurple()
         )
-        if len(words) == 0:
+        if len(banned_words) == 0:
             embed = disnake.Embed(
             title="Nincsenek még bannolt szavak!",
             description="",
@@ -98,7 +100,7 @@ class AutoMod(commands.Cog):
             )
             await inter.response.send_message(embed=embed)        
             return
-        for word in words:
+        for word in banned_words:
             embed.description += f'{word}\n'
         await inter.response.send_message(embed=embed)
 

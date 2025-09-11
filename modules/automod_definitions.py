@@ -1,6 +1,7 @@
 from data.db import banned_words
 from data.db import moderationDict
 from pathlib import Path
+from disnake import Message
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 banned_words_file = BASE_DIR / "data" / "banned_words.txt"
@@ -20,10 +21,6 @@ async def InsertBannedWord(word: str) -> None:
             f.write(f"{word}\n")
         banned_words.append(word)
 
-
-async def GetBannedWordList() -> list[str]:
-    return banned_words
-
 async def RemoveBannedWord(word: str) -> None:
     if word in banned_words:
         banned_words.remove(word)
@@ -31,29 +28,51 @@ async def RemoveBannedWord(word: str) -> None:
             for line in banned_words:
                     f.write(f"{line}\n")
 
-async def CheckBannedWord(message: str, userId: int) -> bool:
+async def CheckBannedWord(message: Message, userId: int) -> bool:
     for word in banned_words:
         if word in message.content:
-            if moderationDict.get(userId) is not None:
-                moderationDict[userId]['bannedCount'] += 1
-            else:
-                moderationDict[userId] = {'bannedCount': 1, 'inviteBanExpiry': None}
-            return True
+            for item in moderationDict.items():
+                if item[0] is not None:
+                    if item[0] == userId:
+                        item[1][0]+=1
+                else:
+                    if item[0] == userId:
+                        item[1][0] = 1
+                        item[1][1] = None
+                return True
     return False
+            
 
 async def GetBannedWordCount(userId: int) -> int:
-    if moderationDict.get(userId) is not None:
-        return moderationDict[userId]['bannedCount']
-    return 0
+    for item in list(moderationDict.items()):
+        if item[0] is not None:
+            return item[1][0]
+        return 0
 
 async def UpdateBanExpiry(user_id: int, ban_expiry) -> None:
-    moderationDict[user_id]['inviteBanExpiry'] = ban_expiry
+    for item in list(moderationDict.items()):
+        if item[0 == user_id]:
+            item[1][1] = ban_expiry
 
-async def GetBanExpiries() -> list[dict]:
-    records_list = [{"userId": userId, **info} for userId, info in moderationDict.items()]
+async def GetBanExpiries() -> list[list]:
+    records_list = []
+    for item in list(moderationDict.items()):
+        if item[0] is not None:
+            records_list.append([item[0], item[1][1]])
     return records_list
+        
 
 async def DeleteBanExpiry(user_id: int) -> None:
-    if moderationDict.get(user_id) is not None:
-        moderationDict[user_id]['inviteBanExpiry'] = None
-        moderationDict[user_id]['bannedCount'] = 0
+    for item in list(moderationDict.items()):
+        if item[0] is not None:
+            if item[0] == user_id:
+                item[1][0] = 0
+                item[1][1] = None
+
+if __name__ == "__main__":
+    moderationDict = {123456789: [0, 0], 987654321: [2, 123456]} # userID -> int: [bannedCount -> int, inviteBanExpiry -> datetime]
+    records_list = []
+    for item in list(moderationDict.items()):
+        if item[0] is not None:
+            records_list.append([item[0], item[1][1]])
+    print(records_list)

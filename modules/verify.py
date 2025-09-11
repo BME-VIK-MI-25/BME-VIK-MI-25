@@ -1,8 +1,10 @@
 import random
 
-async def CreateAuthCode(email: str, authDict: dict) -> None:
+async def CreateAuthCode(email: str, authDict: dict) -> int:
     authCode = random.randint(1000000000, 9999999999)
     authDict.update({email: authCode})
+    return authCode
+
 
 async def CheckAuthCode(authCode: str, authDict: dict) -> bool:
     authCode = int(authCode)

@@ -3,7 +3,7 @@ import smtplib, ssl
 from dotenv import load_dotenv
 from email.message import EmailMessage
 import os
-from data.db import moderationDict as authDict
+from data.db import VerificationDict as authDict
 
 load_dotenv()
 
@@ -13,7 +13,8 @@ EMAIL = "bme@kadarmarcell.hu"
 SMTP_PW = os.getenv("SMTP_PASSWORD")
 
 async def SendAuthCode(to_email: str):
-    auth_code = await CreateAuthCode(email=to_email, authDict=authDict)
+    authCode = await CreateAuthCode(email=to_email, authDict=authDict)
+
     with smtplib.SMTP_SSL("mail.nethely.hu", port, context=context) as email_server:
         email_server.login(EMAIL, SMTP_PW)
         message = EmailMessage()
@@ -45,7 +46,7 @@ async def SendAuthCode(to_email: str):
                 </p>
 
                 <div style="background-color: black; width: 102px; height: 28px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin-bottom: 33px; margin-left: 199px; ">
-                  <p style="color: #ffffff; font-size: 13px; font-weight: bold; margin: 0;">{auth_code}</p>
+                  <p style="color: #ffffff; font-size: 13px; font-weight: bold; margin: 0;">{authCode}</p>
                 </div>
 
                 <p style="width: 500px; font-size: 12px; margin-top: 0;">
